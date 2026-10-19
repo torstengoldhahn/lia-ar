@@ -2,7 +2,7 @@ LIA – AR-Avatar zur generalistischen Pflegeausbildung
 =====================================================
 
 Inhalt des Ordners
-  audio/          Lias Stimme, ein Satz pro Datei
+  audio/          Lias Stimme: lia-de.mp3 / lia-en.mp3 (+ Zeitmarken .json)
   index.html      Die AR-Seite (Startseite, Karten-AR, Tisch-AR, Druckkarte)
   lia-ziel.mind   Tracking-Daten für das Kartenmotiv (nicht verändern)
   lia-ziel.jpg    Das Kartenmotiv, auf dem Lia steht
@@ -23,16 +23,19 @@ Inhalt des Ordners
    Tipp: Karte auf Pappe kleben, damit sie flach liegt.
 
 3. Benutzen
-   QR-Code scannen → "Mit Karte starten" → Kamera erlauben →
-   Handy über das Bildmotiv halten (ca. 30–40 cm). Lia erscheint auf der
-   Karte, winkt und erzählt. Mit + / – lässt sich ihre Größe ändern.
-   Auf Android-Handys mit ARCore gibt es zusätzlich
-   "Ohne Karte auf den Tisch stellen": Fläche suchen, antippen, fertig.
+   QR-Code scannen → "Deutsch" oder "English" antippen → Kamera erlauben.
+   Ohne Karte: Handy schräg auf den Tisch richten und dort tippen, wo Lia
+   stehen soll. Android-Handys mit ARCore erkennen die Tischfläche echt;
+   iPhones nutzen den Lagesensor (Lia bleibt beim Drehen des Handys stehen,
+   beim Herumlaufen wandert sie mit).
+   Mit Karte (am genauesten, auch auf dem iPhone): "Ich habe die Lia-Karte"
+   tippen und Handy über das Bildmotiv halten.
+   Oben: Sprache DE/EN umschalten, + / – für die Größe.
 
 Hinweise
-  - Lias Stimme besteht aus fertigen Tondateien im Ordner audio/
-    (s01.mp3 bis s30.mp3, ein Satz pro Datei). Wer Texte ändert, braucht
-    neue Tondateien – oder spricht sie selbst ein (gleiche Dateinamen).
+  - Lias Stimme besteht aus zwei durchgehenden Tonspuren (Deutsch und
+    Englisch) im Ordner audio/. Die .json-Dateien enthalten die Zeitmarken
+    der Sätze und die Lippenbewegung. Wer Texte ändert, braucht neue Spuren.
   - Nach dem Scannen einmal antippen: Erst dann dürfen Handys Ton abspielen.
   - Die Seite lädt three.js und MindAR von cdn.jsdelivr.net; das Gerät
     braucht dafür Internet.

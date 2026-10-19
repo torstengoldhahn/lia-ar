@@ -23,10 +23,13 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 /* Startseite */
 #start{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;overflow:auto;
   padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-.head{display:flex;align-items:center;gap:10px}
+.head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .head i{width:26px;height:26px;border-radius:50%;background:var(--accent)}
 .head b{font:800 18px var(--display)}
-.head span{color:var(--muted);font-size:13px}
+.head span{color:var(--muted);font-size:13px;flex:1}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.lang button{border:0;background:transparent;padding:6px 12px;font-weight:700;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:#fff}
 .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center;max-width:980px;width:100%;margin:0 auto}
 #prev{width:100%;aspect-ratio:3/4;max-height:62vh;display:block;
   background:radial-gradient(110% 85% at 50% 18%,#f1ece6 0%,#d9d2ca 55%,#b7aea5 100%);border-radius:22px}
@@ -40,24 +43,38 @@ h1 em{font-style:normal;color:var(--accent)}
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
 .btn.primary small{color:rgba(255,255,255,.85)}
 .note{font-size:12.5px;color:var(--muted);max-width:980px;margin:12px auto 0;width:100%}
-@media (max-width:720px){.hero{grid-template-columns:1fr}#prev{max-height:38vh;aspect-ratio:auto;height:38vh}}
+@media (max-width:720px){.hero{grid-template-columns:1fr}#prev{max-height:34vh;aspect-ratio:auto;height:34vh}}
+
+/* Tor nach dem QR-Scan */
+#gate{position:fixed;inset:0;z-index:30;display:grid;place-items:center;text-align:center;
+  background:radial-gradient(120% 90% at 50% 10%,#2a3242 0%,#141922 70%);color:#fff;
+  padding:calc(24px + env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+#gate .in{display:grid;gap:14px;max-width:360px;width:100%}
+#gate .dot{width:44px;height:44px;border-radius:50%;background:var(--accent);margin:0 auto}
+#gate h2{font:800 30px/1.1 var(--display);margin:0}
+#gate p{margin:0;color:rgba(255,255,255,.78)}
+#gate .go{border:0;border-radius:16px;padding:16px;font:800 19px var(--display);background:var(--accent);color:#fff}
+#gate .go.alt{background:#fff;color:var(--ink)}
+#gate .small{font-size:13px;background:none;border:0;color:rgba(255,255,255,.8);text-decoration:underline}
 
 /* AR */
 #ar{position:fixed;inset:0;background:#000}
 #ar video{object-fit:cover}
+#ar .camfeed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#ar .gl{position:absolute;inset:0}
 #hud{position:fixed;inset:0;pointer-events:none;color:var(--hud-ink);z-index:20}
 #hud .top{position:absolute;top:calc(10px + env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));
-  display:flex;gap:8px;align-items:center;justify-content:space-between}
+  display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .pill{pointer-events:auto;background:var(--hud);color:var(--hud-ink);border:0;border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px;backdrop-filter:blur(6px)}
 .status{pointer-events:none}
-#scanHint{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;width:min(84%,340px);
+#scanHint{position:absolute;left:50%;top:27%;transform:translate(-50%,-50%);text-align:center;width:min(84%,340px);
   background:var(--hud);border-radius:16px;padding:16px 18px;font-size:15px}
+#scanHint .frame{width:120px;height:84px;margin:0 auto 10px;border:3px dashed rgba(255,255,255,.85);border-radius:10px}
 #tapSound{position:absolute;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);pointer-events:auto;
   background:var(--accent);color:#fff;border:0;border-radius:999px;padding:12px 20px;font:800 16px var(--display);box-shadow:0 6px 20px rgba(0,0,0,.3);
   animation:pulse 1.6s ease-in-out infinite;white-space:nowrap}
 @keyframes pulse{50%{transform:translateX(-50%) scale(1.06)}}
 @media (prefers-reduced-motion:reduce){#tapSound{animation:none}}
-#scanHint .frame{width:120px;height:84px;margin:0 auto 10px;border:3px dashed rgba(255,255,255,.85);border-radius:10px}
 #hud .bottom{position:absolute;left:0;right:0;bottom:0;padding:0 max(12px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
   display:grid;gap:8px}
 #sub{margin:0 auto;max-width:640px;background:var(--hud);border-radius:14px;padding:10px 14px;font-size:17px;line-height:1.42;text-wrap:balance;text-align:center}
@@ -66,8 +83,8 @@ h1 em{font-style:normal;color:var(--accent)}
 #chips{display:flex;gap:6px;overflow-x:auto;pointer-events:auto;padding-bottom:2px;scrollbar-width:none}
 #chips button{flex:none;border:1px solid transparent;background:var(--hud);color:#fff;border-radius:999px;padding:6px 11px;font-size:13px;white-space:nowrap}
 #chips button[aria-current="true"]{border-color:#fff}
-#card{position:absolute;right:max(12px,env(safe-area-inset-right));top:calc(58px + env(safe-area-inset-top));width:min(260px,calc(100% - 24px));
-  background:var(--surface);color:var(--ink);border-radius:14px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);font-size:12.5px;transition:opacity .3s}
+#card{position:absolute;right:max(12px,env(safe-area-inset-right));top:calc(100px + env(safe-area-inset-top));width:min(260px,calc(100% - 24px));
+  background:var(--surface);color:var(--ink);border-radius:14px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);font-size:12.5px;transition:opacity .3s;pointer-events:none}
 #card[data-off="1"]{opacity:0}
 #card h3{margin:0 0 6px;font:800 14px var(--display)}
 .bars{display:grid;gap:4px}
@@ -94,7 +111,7 @@ h1 em{font-style:normal;color:var(--accent)}
 @media print{
   @page{size:A5 landscape;margin:0}
   body{background:#fff;overflow:visible}
-  #start,#ar,#hud,.ptools{display:none!important}
+  #start,#gate,#ar,#hud,.ptools{display:none!important}
   #print{position:static;padding:0;background:#fff}
   .sheet{border:0;width:210mm;height:148mm;grid-template-columns:140mm 1fr}
 }
@@ -111,43 +128,58 @@ h1 em{font-style:normal;color:var(--accent)}
 <body>
 
 <section id="start">
-  <div class="head"><i></i><b>Lia</b><span>AWO Bamberg Stadt und Land · Pflegeausbildung</span></div>
+  <div class="head"><i></i><b>Lia</b><span>AWO Bamberg Stadt und Land · Pflegeausbildung</span>
+    <div class="lang" role="group" aria-label="Sprache / Language"><button data-lang="de" aria-pressed="true">DE</button><button data-lang="en" aria-pressed="false">EN</button></div></div>
   <div class="hero">
     <canvas id="prev" aria-label="Vorschau: Lia, eine Pflegefachperson in Kasack mit Stethoskop"></canvas>
     <div>
-      <h1>Lia steht gleich <em>auf deinem Tisch.</em></h1>
-      <p class="lead">Lia ist Pflegefachperson und erklärt dir in rund vier Minuten die generalistische Pflegeausbildung. Richte die Kamera auf die Lia-Karte, dann steht sie darauf und erzählt.</p>
+      <h1 data-i="h1">Lia steht gleich <em>auf deinem Tisch.</em></h1>
+      <p class="lead" data-i="lead">Lia ist Pflegefachperson und erklärt dir in drei Minuten die generalistische Pflegeausbildung.</p>
       <div class="actions">
-        <button class="btn primary" id="goCard"><strong>Mit Karte starten</strong><small>Kamera auf das Lia-Bild der Karte richten</small></button>
-        <button class="btn" id="goXR" hidden><strong>Ohne Karte auf den Tisch stellen</strong><small>Fläche suchen und antippen (Android mit ARCore)</small></button>
-        <button class="btn" id="goListen"><strong>Ohne Kamera anhören</strong><small>Lia erzählt hier in der Vorschau</small></button>
-        <button class="btn" id="goPrint"><strong>Karte drucken</strong><small>A5 quer, mit QR-Code zu dieser Seite</small></button>
+        <button class="btn primary" id="goFree"><strong data-i="free">Auf den Tisch stellen</strong><small data-i="freeS">Kamera starten, Tisch anpeilen, antippen</small></button>
+        <button class="btn" id="goCard"><strong data-i="card">Mit Lia-Karte</strong><small data-i="cardS">Am genauesten: Lia steht fest auf der gedruckten Karte</small></button>
+        <button class="btn" id="goListen"><strong data-i="listen">Ohne Kamera anhören</strong><small data-i="listenS">Lia erzählt hier in der Vorschau</small></button>
+        <button class="btn" id="goPrint"><strong data-i="print">Karte drucken</strong><small data-i="printS">A5 quer, mit QR-Code</small></button>
       </div>
     </div>
   </div>
-  <p class="note" id="envNote">Kamera und AR brauchen eine Verbindung über https. Bitte Ton am Handy einschalten.</p>
+  <p class="note" id="envNote" data-i="note">Kamera und AR brauchen eine Verbindung über https. Bitte Ton am Handy einschalten.</p>
+</section>
+
+<section id="gate" hidden>
+  <div class="in">
+    <div class="dot"></div>
+    <h2>Lia</h2>
+    <p>Pflegeausbildung bei der AWO · Nursing training at AWO</p>
+    <button class="go" data-go="de">▶ Deutsch</button>
+    <button class="go alt" data-go="en">▶ English</button>
+    <p style="font-size:13px">Kamera erlauben, Handy auf den Tisch richten. · Allow the camera and point at your desk.</p>
+    <button class="small" id="gateCard">Ich habe die Lia-Karte · I have the Lia card</button>
+  </div>
 </section>
 
 <div id="ar" hidden></div>
 
 <div id="hud" hidden>
   <div class="top">
-    <button class="pill" id="exit" aria-label="AR beenden">✕ Beenden</button>
-    <div class="pill status" id="status">Kamera startet …</div>
+    <button class="pill" id="exit" aria-label="Beenden">✕</button>
+    <div class="pill status" id="status"></div>
     <div style="display:flex;gap:6px">
+      <button class="pill" id="langB">EN</button>
       <button class="pill" id="smaller" aria-label="Lia kleiner">–</button>
       <button class="pill" id="bigger" aria-label="Lia größer">+</button>
     </div>
   </div>
-  <button id="tapSound" hidden>🔊 Antippen, damit Lia spricht</button>
-  <div id="scanHint"><div class="frame"></div><span id="scanText">Richte die Kamera auf das Lia-Bild der Karte.</span></div>
+  <button id="tapSound" hidden></button>
+  <div id="scanHint"><div class="frame" id="frame"></div><span id="scanText"></span></div>
   <div id="card" data-off="1"></div>
   <div class="bottom">
     <p id="sub" hidden></p>
     <div class="ctl">
-      <button class="pill main" id="play">Abspielen</button>
-      <button class="pill" id="replace" hidden>Neu platzieren</button>
-      <button class="pill" id="mute" aria-pressed="false">Nur Untertitel</button>
+      <button class="pill main" id="play"></button>
+      <button class="pill" id="replace" hidden></button>
+      <button class="pill" id="switchMode" hidden></button>
+      <button class="pill" id="mute" aria-pressed="false"></button>
     </div>
     <nav id="chips" aria-label="Themen"></nav>
   </div>
@@ -162,12 +194,12 @@ h1 em{font-style:normal;color:var(--accent)}
       <div class="qr" id="qr"></div>
       <ol>
         <li>QR-Code scannen</li>
-        <li>„Mit Karte starten“ tippen und Kamera erlauben</li>
-        <li>Handy über das Bild links halten: Lia steht darauf und erzählt</li>
+        <li>Sprache antippen, Kamera erlauben</li>
+        <li>„Ich habe die Lia-Karte“ wählen und Handy über das Bild halten</li>
       </ol>
     </div>
   </div>
-  <p class="note" style="text-align:center">Farbig auf mattes Papier drucken und flach hinlegen. Das Bild links muss ganz im Kamerabild sein.</p>
+  <p class="note" style="text-align:center">Farbig auf mattes Papier drucken und flach hinlegen.</p>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
@@ -224,8 +256,46 @@ const CARDS = {
 const ITEMS=[]; CH.forEach((c,ci)=>c.s.forEach(s=>ITEMS.push({c:ci,s})));
 const firstOf=ci=>ITEMS.findIndex(it=>it.c===ci);
 
+const EN_T=["Hello!", "What is generalist training?", "Duration & structure", "Placements", "Right to choose", "Requirements", "Exam & future", "At AWO"];
+const EN_S=["Hello, I'm Lia, great to have you here!", "I'll tell you how the generalist nursing training works.", "Just tap a topic below, or listen to everything in one go.", "Since 2020, Germany has had one shared nursing training.", "It combines the former geriatric care, general nursing and paediatric nursing into a single profession.", "The qualification is called registered nurse (Pflegefachfrau, Pflegefachmann or Pflegefachperson).", "You learn to care for people of all ages: in hospitals, in care homes and in their own homes.", "Full-time, the training takes three years, part-time up to five.", "You learn in two places: at least 2,100 hours at nursing school, and at least 2,500 hours in practice.", "Theory and practice alternate in blocks.", "During your placements, experienced practical instructors support you.", "Your practical training starts with your training provider, with the orientation placement.", "Then come mandatory placements in hospital, in residential long-term care and in home care.", "There are also shorter placements in paediatric nursing and in psychiatry.", "Finally, you do the in-depth placement of 500 hours, again with your provider. That's where you become really confident.", "If your in-depth placement is in long-term care or in paediatric nursing, you get a choice before the final third of your training.", "You stay generalist, or you graduate specifically in geriatric care or in paediatric nursing.", "My tip: almost everyone stays generalist. Only this qualification is automatically recognised throughout the EU.", "Whether the special qualifications will continue in the long run is currently being reviewed by lawmakers.", "You need an intermediate school-leaving certificate, or another completed ten years of schooling.", "With a lower secondary certificate it also works if you have two years of vocational training or a training in nursing assistance.", "You also need to be medically fit, a certificate of good conduct and good German skills, usually at level B2.", "At the end there is a state exam: written, oral and practical.", "After that, you take on tasks that only registered nurses are allowed to do.", "You assess care needs, manage the nursing process and ensure the quality of care.", "You don't pay any school fees. On the contrary, you receive a training allowance.", "Later on, further training, management roles or a nursing degree are open to you.", "At AWO Bamberg, you learn with an employer that has clear values: solidarity, tolerance, freedom, equality and justice.", "Your pay is based on our collective agreement.", "Curious? Then get in touch with our HR department. We look forward to hearing from you!"];
+
+const CARDS_EN = {
+ aufbau:`<h3>Two places, 3 years</h3><div class="big"><div><strong>2,100</strong>h nursing school</div><div><strong>2,500</strong>h practice</div></div><p class="foot">Minimum hours · part-time up to 5 years</p>`,
+ einsaetze:(()=>{const d=[["Orientation (provider)",400],["Acute inpatient care",400],["Long-term residential care",400],["Home care",400],["Paediatrics",120],["Psychiatry",120],["In-depth (provider)",500,1],["Further placements",80],["Free allocation",80]];
+  return `<h3>Practice: 2,500 hours</h3><div class="bars">${d.map(([n,h,v])=>`<div class="bar${v?" v":""}"><div>${n}<span style="width:${h/5}%"></span></div><b>${h}</b></div>`).join("")}</div>`})(),
+ wahl:`<h3>Right to choose used (2024)</h3><div class="big"><div><strong>83</strong>geriatric care</div><div><strong>324</strong>paediatric nursing</div></div><p class="foot">Source: report to the German Bundestag, 21/4030</p>`
+};
+const UI={
+ de:{h1:'Lia steht gleich <em>auf deinem Tisch.</em>',lead:"Lia ist Pflegefachperson und erklärt dir in drei Minuten die generalistische Pflegeausbildung.",
+   free:"Auf den Tisch stellen",freeS:"Kamera starten, Tisch anpeilen, antippen",card:"Mit Lia-Karte",cardS:"Am genauesten: Lia steht fest auf der gedruckten Karte",
+   listen:"Ohne Kamera anhören",listenS:"Lia erzählt hier in der Vorschau",print:"Karte drucken",printS:"A5 quer, mit QR-Code",
+   note:"Kamera und AR brauchen eine Verbindung über https. Bitte Ton am Handy einschalten.",
+   tap:"🔊 Antippen, damit Lia spricht",play:"Abspielen",pause:"Pause",resume:"Weiter",again:"Nochmal",mute:"Ton aus",unmute:"Ton an",
+   replace:"Neu platzieren",toCard:"Mit Karte",toFree:"Ohne Karte",start:"Kamera startet …",
+   aimDesk:"Richte das Handy schräg auf den Tisch und tippe dort, wo Lia stehen soll.",placed:"Lia steht auf dem Tisch",searchPlane:"Fläche suchen …",
+   scanCard:"Richte die Kamera auf das Lia-Bild der Karte.",onCard:"Lia steht auf der Karte",lost:"Karte nicht im Bild",searchCard:"Suche Karte …",
+   noCam:"Die Kamera konnte nicht gestartet werden. Bitte Kamerazugriff erlauben und die Seite neu laden.",https:"Die Kamera funktioniert nur über https.",
+   done:"Das war's! Tippe ein Thema an, um es noch einmal zu hören.",preview:"Vorschau"},
+ en:{h1:'Lia is about to stand <em>on your desk.</em>',lead:"Lia is a registered nurse and explains Germany's generalist nursing training in three minutes.",
+   free:"Place on my desk",freeS:"Start the camera, aim at your desk, tap",card:"With the Lia card",cardS:"Most precise: Lia stands on the printed card",
+   listen:"Listen without camera",listenS:"Lia talks here in the preview",print:"Print card",printS:"A5 landscape, with QR code",
+   note:"Camera and AR need an https connection. Please turn your phone's sound on.",
+   tap:"🔊 Tap so Lia can talk",play:"Play",pause:"Pause",resume:"Resume",again:"Again",mute:"Sound off",unmute:"Sound on",
+   replace:"Place again",toCard:"Use card",toFree:"No card",start:"Starting camera …",
+   aimDesk:"Point your phone at the desk at an angle and tap where Lia should stand.",placed:"Lia is on your desk",searchPlane:"Looking for a surface …",
+   scanCard:"Point the camera at the Lia picture on the card.",onCard:"Lia is on the card",lost:"Card not in view",searchCard:"Looking for the card …",
+   noCam:"The camera could not start. Please allow camera access and reload.",https:"The camera only works over https.",
+   done:"That's it! Tap a topic to hear it again.",preview:"Preview"}
+};
+let LANG=(()=>{try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="de")return q;}catch(e){}
+  return /^de/i.test(navigator.language||"de")?"de":"en";})();
+const tx=k=>UI[LANG][k];
+const sentence=i=>LANG==="en"?EN_S[i]:ITEMS[i].s;
+const chapterTitle=ci=>LANG==="en"?EN_T[ci]:CH[ci].t;
+const cardHtml=k=>LANG==="en"?CARDS_EN[k]:CARDS[k];
+
 /* =================== Avatar =================== */
-const sp={on:false,text:"",syncChar:0,syncT:0,cps:14.5};      // Sprechzustand (Lippen)
+const sp={on:false,text:"",t0:0,t1:1};                         // Sprechzustand (Lippen)
 const cue={wave:0,brow:0,nod:0};                               // Gesten-Impulse
 const VIS={a:[.95,1.05],ä:[.7,1.1],e:[.55,1.12],i:[.35,1.18],o:[.7,.78],ö:[.55,.8],u:[.4,.68],ü:[.38,.7],y:[.38,.7],
   m:[0,.95],b:[0,.95],p:[0,.95],f:[.1,1.02],v:[.1,1.02],w:[.12,1],l:[.3,1],n:[.22,1],r:[.32,.98],s:[.18,1.08],z:[.18,1.08],
@@ -354,9 +424,13 @@ function createLia(){
     const m=reduce?.35:1, talk=sp.on?1:0;
     // Zum Betrachter drehen (nur in AR)
     if(follow&&camWorld&&lia.parent){tmp.copy(camWorld);lia.parent.worldToLocal(tmp);
+      if(!isFinite(tmp.x+tmp.y+tmp.z))tmp.set(0,0,1);
       const dx=tmp.x-lia.position.x, dz=tmp.z-lia.position.z, dy=tmp.y-lia.position.y, hz=Math.hypot(dx,dz);
       const w=clamp(hz/Math.max(1e-6,Math.hypot(hz,dy))*2.2-.3,0,1);           // senkrecht von oben: nicht drehen
       if(hz>1e-6&&w>0){let d=Math.atan2(dx,dz)-lia.rotation.y; d=Math.atan2(Math.sin(d),Math.cos(d)); lia.rotation.y+=d*Math.min(1,dt*1.2)*w;}}
+    // Schutz: ungültige Werte (z. B. bei kurzem Tracking-Verlust) zurücksetzen
+    [head.rotation,lia.rotation,...eyes.map(e=>e.rotation),...lids.map(l=>l.rotation)].forEach(r=>{if(!isFinite(r.x))r.x=0;if(!isFinite(r.y))r.y=0;if(!isFinite(r.z))r.z=0;});
+    if(!isFinite(open))open=0; if(!isFinite(width))width=1;
     const br=Math.sin(t*1.35);
     torso.scale.set(1+br*.004,1+br*.006,1+br*.008);
     hips.rotation.z=nz(t*.25,1,1.7,2.9)*.018*m; hips.position.x=nz(t*.25,1.1,1.9,.7)*.012*m;
@@ -365,6 +439,7 @@ function createLia(){
     // Blickrichtung zur Kamera
     let yawT=0,pitT=.12;
     if(camWorld){tmp.copy(camWorld);neckGrp.worldToLocal(tmp);
+      if(!isFinite(tmp.x+tmp.y+tmp.z))tmp.set(0,.19,1);
       const hz=Math.hypot(tmp.x,tmp.z), dy=tmp.y-.19, w=clamp(hz/Math.max(1e-6,Math.hypot(hz,dy))*2.2-.3,0,1);
       yawT=tmp.z>0?Math.atan2(tmp.x,tmp.z)*w:0; pitT=-Math.atan2(dy,hz); }
     cue.nod*=Math.pow(.02,dt);
@@ -382,13 +457,10 @@ function createLia(){
     lowLids.forEach(l=>l.rotation.x=.62+lidG*.3);
     cue.brow*=Math.pow(.15,dt); brows.position.y=cue.brow*.08+talk*Math.max(0,nz(t,2.3,3.7,1.1))*.03;
     let to=0,tw=1;
-    if(sp.on&&sp.audio&&sp.env){const tt=player.currentTime, d=player.duration||sp.env.length/30;
-      const e=sp.env[Math.min(sp.env.length-1,Math.floor(tt*30))]||0, i=Math.floor(tt/d*sp.text.length);
+    if(sp.on&&TRACK){const tt=player.currentTime, e=TRACK.env[Math.min(TRACK.env.length-1,Math.floor(tt*30))]||0;
+      const f=clamp((tt-sp.t0)/Math.max(.1,sp.t1-sp.t0),0,.999), i=Math.floor(f*sp.text.length);
       const c=(sp.text[i]||" ").toLowerCase(), v=VIS[sp.text.slice(i,i+2).toLowerCase()]||VIS[c];
       to=e<.08?0:Math.min(1,e*1.05); tw=v?v[1]:1;}
-    else if(sp.on){const pos=sp.syncChar+(performance.now()-sp.syncT)/1000*sp.cps, i=Math.floor(pos);
-      if(i<sp.text.length){const c=sp.text[i].toLowerCase(), c2=sp.text.slice(i,i+2).toLowerCase();
-        const v=VIS[c2]||VIS[c]; if(v){to=v[0];tw=v[1];} else {to=.05;tw=1;}}}
     open=lerp(open,to,Math.min(1,dt*22)); width=lerp(width,tw,Math.min(1,dt*18));
     loLip.position.y=-open*.09; cavity.scale.y=.1+open*.85; cavity.position.y=-.02-open*.05;
     mouth.scale.x=width*.9; upLip.position.y=open*.015;
@@ -405,6 +477,15 @@ function createLia(){
   return {lia,update};
 }
 
+
+/* =================== Tonspur =================== */
+const player=new Audio(); player.preload="auto"; player.setAttribute("playsinline","");
+const TRACKS={}; let TRACK=null;
+for(const l of ["de","en"]) fetch(`audio/lia-${l}.json`).then(r=>r.json()).then(j=>{TRACKS[l]=j;if(l===LANG)TRACK=j;}).catch(()=>{});
+function setTrack(){TRACK=TRACKS[LANG]||null;const src=`audio/lia-${LANG}.mp3`;if(!player.src.endsWith(src)){player.src=src;player.load();}}
+setTrack();
+function unlockAudio(){try{player.muted=true;const p=player.play();if(p)p.then(()=>{if(!playing){player.pause();}player.muted=muted;}).catch(()=>{player.muted=muted;});}catch(e){}}
+
 /* =================== Vorschau (ohne AR) =================== */
 const prevCanvas=document.getElementById("prev");
 const pRenderer=new THREE.WebGLRenderer({canvas:prevCanvas,alpha:true,antialias:true});
@@ -419,164 +500,218 @@ new ResizeObserver(pResize).observe(prevCanvas); pResize();
 pRenderer.setAnimationLoop(()=>{if(!previewOn)return;const dt=Math.min(clock.getDelta(),.05);
   pLia.update(dt,clock.elapsedTime,pCam.position,false);pRenderer.render(pScene,pCam);});
 
-/* =================== Sprache (eingesprochene Tondateien) =================== */
-const ENV={"s01.mp3":[0.02,0.11,0.28,0.74,0.97,0.78,0.81,0.83,1.0,1.0,1.0,0.93,0.81,0.69,0.58,0.19,0.03,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.03,0.08,0.13,0.39,0.64,0.34,0.33,0.18,0.02,0.13,0.93,0.86,0.72,0.92,0.79,0.58,0.57,0.5,0.55,0.7,0.54,0.56,0.53,0.25,0.27,0.49,0.65,0.39,0.66,1.0,0.97,0.94,0.94,0.92,0.74,0.78,0.8,0.75,0.5,0.1,0.05,0.61,1.0,0.75,0.33,0.28,0.12,0.03,0.19,0.59,0.6,0.19,0.24,0.86,0.77,0.71,0.25,0.09,0.59,1.0,0.46,0.28,0.26,0.26,0.23,0.18,0.19,0.12,0.18,0.13,0.02,0.02,0.02,0.02,0.02,0.02,0.02],"s02.mp3":[0.39,0.4,0.39,0.4,0.41,0.4,0.41,0.67,0.64,0.55,0.54,0.45,0.42,0.59,1.0,0.72,0.43,0.45,0.61,0.47,1.0,1.0,1.0,0.79,0.96,1.0,0.43,0.47,0.43,0.72,0.77,0.88,1.0,0.95,0.82,0.91,0.41,0.43,0.39,0.39,0.38,0.39,0.39,0.39,0.39,0.39,0.39,0.4,0.45,0.85,0.48,0.51,0.76,0.46,0.49,1.0,0.85,0.94,0.89,0.79,0.57,0.46,0.64,0.71,0.72,0.67,0.69,0.53,0.52,0.4,0.43,0.61,0.63,0.65,0.65,0.81,0.7,0.42,0.4,0.4,0.43,0.49,0.73,1.0,0.67,0.44,0.66,0.89,0.64,0.46,0.53,0.56,0.72,0.8,0.67,0.52,0.5,0.4,0.44,0.72,1.0,0.97,0.75,0.5,0.84,0.96,0.99,0.63,0.43,0.47,0.47,0.99,0.85,0.76,0.53,0.44,0.43,0.42,0.44,0.46,0.94,0.92,0.83,0.75,0.67,0.73,0.62,0.51,0.48,0.46,0.42,0.43,0.4,0.44,0.4,0.44,0.4,0.4,0.39,0.38,0.39,0.37,0.39,0.38,0.39,0.38,0.39,0.39,0.39,0.39,0.39,0.39,0.39,0.4,0.4,0.4,0.4,0.39,0.4,0.17,0.0],"s03.mp3":[0.07,0.2,0.68,0.81,0.38,0.01,0.06,0.01,0.01,0.79,0.78,0.53,0.48,0.08,0.0,0.0,0.05,0.46,0.32,0.16,0.12,0.27,0.32,0.35,0.33,0.39,0.19,0.06,0.06,0.05,0.87,0.91,0.33,0.12,0.12,0.1,0.2,0.16,0.62,0.28,0.06,0.04,0.27,0.36,0.38,0.3,0.29,0.04,0.2,0.18,0.37,0.76,0.86,1.0,1.0,1.0,0.61,0.42,0.43,0.5,0.42,0.4,0.4,0.31,0.25,0.22,0.12,0.03,0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.42,0.83,0.29,0.65,1.0,1.0,0.67,0.29,0.2,0.5,0.93,1.0,0.83,1.0,0.69,0.08,0.19,0.46,0.44,0.97,0.89,0.47,0.16,0.47,0.6,0.65,0.69,0.93,0.73,0.2,0.21,0.19,0.09,0.32,0.39,0.29,0.3,0.2,0.36,0.05,0.11,0.44,0.61,0.05,0.0,0.14,0.02,0.26,0.24,0.2,0.13,0.1,0.12,0.07,0.07,0.04,0.01],"s04.mp3":[0.02,0.14,0.22,1.0,1.0,0.24,0.02,0.15,0.28,0.09,0.95,1.0,0.82,0.83,0.97,0.5,0.02,0.28,0.16,0.55,0.73,0.67,0.69,0.33,0.21,0.36,0.57,0.41,0.12,0.28,0.19,0.18,1.0,0.83,0.5,0.51,0.48,0.12,0.22,0.26,0.8,0.4,0.28,0.26,0.03,0.09,0.29,0.78,0.68,0.03,0.01,0.04,0.14,0.68,0.47,0.27,0.27,0.09,0.19,0.31,0.41,0.32,0.04,0.89,1.0,0.82,0.67,0.85,0.24,0.09,0.43,0.54,0.19,0.34,0.72,0.84,0.78,0.74,0.76,0.83,0.65,0.13,0.17,0.3,0.52,0.45,0.5,0.5,0.13,0.15,1.0,0.55,0.54,0.52,0.55,0.46,0.48,0.56,0.54,0.59,0.37,0.36,0.86,0.54,0.46,0.48,0.49,0.21,0.01,0.05,0.1,0.11,0.48,0.91,1.0,1.0,0.26,0.23,0.99,0.71,0.49,0.5,0.55,0.75,0.61,0.23,0.18,0.06,0.01,0.06,0.52,0.62,0.5,0.5,0.21,0.02,0.27,0.26,0.11,0.09,0.15,0.15,0.07,0.0],"s05.mp3":[0.02,0.12,0.17,0.44,0.47,0.1,0.13,0.76,1.0,0.51,0.02,0.27,1.0,0.96,0.85,0.85,0.83,0.47,0.9,1.0,0.2,0.06,0.27,0.21,0.02,0.12,0.46,0.61,0.22,0.11,0.11,0.07,0.13,0.77,0.8,0.86,1.0,1.0,1.0,0.33,0.3,0.87,0.99,0.73,0.07,0.56,0.74,0.75,0.98,0.45,0.01,0.01,0.28,0.42,0.33,0.08,0.05,0.1,0.1,0.33,0.57,0.74,0.83,0.9,0.74,0.09,0.11,0.96,1.0,0.73,0.59,0.26,0.01,0.0,0.0,0.06,0.42,0.44,0.02,0.2,0.16,0.16,0.58,0.7,0.49,0.48,0.16,0.0,0.02,0.35,0.44,0.17,0.06,0.1,0.09,0.33,0.68,0.96,0.92,0.77,0.16,0.22,1.0,1.0,1.0,0.53,0.19,0.57,0.61,0.38,0.24,0.19,0.02,0.07,0.47,0.38,0.02,0.19,0.25,0.8,0.77,0.5,0.5,0.45,0.87,0.83,0.61,0.09,0.1,0.14,0.13,0.44,0.68,0.53,0.4,0.28,0.01,0.01,0.13,0.48,0.44,0.17,0.08,0.13,0.1,0.49,0.77,1.0,0.99,0.53,0.12,0.71,0.89,0.2,0.03,0.19,0.15,0.66,0.65,0.35,0.23,0.47,0.62,0.44,0.54,0.49,0.4,0.19,0.01,0.45,0.47,0.73,0.71,0.61,0.31,0.08,0.21,0.21,0.78,0.6,0.05,0.17,0.31,0.27,0.16,0.14,0.83,0.73,0.23,0.05,0.33,0.37,0.38,0.33,0.14,0.06,0.05,0.05,0.05,0.04,0.03,0.02,0.01],"s06.mp3":[0.04,0.03,0.32,0.97,0.83,0.84,0.71,0.64,0.18,0.23,0.54,0.85,0.59,0.33,0.76,1.0,0.58,0.38,0.27,0.3,0.18,0.31,0.72,0.87,0.86,1.0,0.63,0.35,0.36,0.06,0.22,0.13,0.07,0.08,0.12,0.46,0.76,0.93,1.0,0.51,0.29,0.84,0.44,0.11,0.12,0.09,0.93,0.88,0.35,0.1,0.16,0.12,0.11,0.12,0.3,0.73,0.87,0.93,1.0,1.0,0.81,0.95,0.93,0.79,0.19,0.04,0.03,0.03,0.07,0.16,0.7,1.0,1.0,1.0,0.18,0.83,0.94,0.61,0.11,0.09,0.19,0.91,0.76,0.24,0.14,0.16,0.2,0.34,0.59,0.65,0.65,0.57,0.48,0.43,0.36,0.11,0.02,0.03,0.02,0.03,0.02,0.02,0.03,0.03,0.02,0.03,0.03,0.03,0.03,0.03,0.53,1.0,0.3,0.74,0.85,0.28,0.04,0.07,0.14,0.14,0.51,0.81,1.0,0.94,0.18,0.3,0.84,0.62,0.11,0.1,0.4,0.99,0.7,0.17,0.24,0.39,0.07,0.18,0.41,0.4,0.29,0.19,0.1,0.12,0.28,0.28,0.24,0.2,0.17,0.12,0.09,0.05,0.04,0.04,0.03],"s07.mp3":[0.04,0.21,0.7,0.9,0.93,0.92,1.0,1.0,0.94,0.76,0.67,0.73,0.6,0.59,0.4,0.21,0.32,0.26,0.06,0.03,0.07,0.1,0.26,0.61,0.86,0.79,0.54,0.5,0.38,0.69,0.53,0.3,0.49,0.45,0.31,0.23,0.7,1.0,1.0,1.0,0.12,0.29,0.58,0.37,0.29,0.25,0.52,0.62,0.79,0.8,0.09,0.41,1.0,0.82,0.29,0.24,0.06,0.07,0.21,0.71,0.41,0.03,0.06,0.11,0.16,0.48,0.61,0.92,1.0,0.98,0.81,0.42,0.24,0.47,0.44,0.33,0.05,0.03,0.03,0.04,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.04,0.37,0.5,0.3,0.25,0.04,0.19,0.19,0.54,0.75,0.74,0.49,0.38,0.09,0.03,0.03,0.4,0.47,0.45,0.3,0.54,0.79,0.89,0.79,0.76,0.8,0.73,0.33,0.3,0.27,0.09,0.04,0.05,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.02,0.03,0.03,0.02,0.03,0.37,0.62,0.51,0.27,0.09,0.21,0.61,1.0,1.0,1.0,0.22,0.21,1.0,0.97,0.67,0.48,0.5,0.67,0.74,0.77,0.83,0.75,0.62,0.45,0.32,0.41,0.49,0.37,0.47,0.13,0.2,0.99,0.94,0.82,0.63,0.27,0.37,0.54,0.5,0.6,0.52,0.35,0.16,0.26,0.2,0.47,0.53,0.29,0.2,0.31,0.42,0.36,0.33,0.3,0.32,0.21,0.3,0.25,0.22,0.3,0.23,0.1,0.04,0.03],"s08.mp3":[0.05,0.49,0.6,0.34,0.09,0.11,0.27,0.99,1.0,0.99,0.92,0.21,0.16,0.2,0.34,0.49,0.56,0.23,0.08,0.01,0.16,0.86,0.84,1.0,1.0,0.83,0.97,1.0,0.51,0.08,0.04,0.1,0.44,0.64,0.45,0.04,0.43,0.54,0.71,0.88,0.93,0.42,0.17,0.11,0.01,0.01,0.55,0.96,0.75,0.72,0.3,0.24,0.86,0.68,0.41,0.4,0.11,0.24,0.1,0.31,0.68,0.69,0.73,1.0,0.87,0.4,0.35,1.0,0.79,0.71,0.63,0.72,0.83,0.64,0.15,0.05,0.29,0.39,0.38,0.18,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.11,0.4,0.45,0.15,0.23,0.22,0.43,0.76,1.0,1.0,0.72,0.06,0.11,0.29,0.2,0.55,0.52,0.53,0.54,0.18,0.0,0.15,0.06,0.58,0.84,0.7,0.33,0.2,0.25,0.14,0.03,0.02,0.41,0.44,0.14,0.18,0.15,0.06,0.05,0.22,0.45,0.22,0.18,0.13,0.07,0.01,0.02],"s09.mp3":[0.07,0.47,0.79,0.82,0.86,1.0,1.0,1.0,0.78,0.65,0.76,0.74,0.77,0.42,0.24,0.06,0.13,0.21,0.46,0.35,0.42,0.25,0.15,0.25,0.07,0.51,1.0,0.86,0.73,0.81,0.78,0.3,0.22,0.5,0.7,1.0,0.77,0.39,0.44,0.01,0.0,0.27,0.52,0.51,0.54,0.57,0.61,0.64,0.66,0.66,0.37,0.96,0.76,0.27,0.27,0.16,0.02,0.03,0.45,0.42,0.17,0.21,0.12,0.02,0.05,0.17,0.09,0.93,0.88,0.87,1.0,0.92,0.07,0.01,0.26,0.25,0.5,0.73,0.95,1.0,0.9,0.27,0.17,0.51,0.48,0.14,0.13,0.03,0.56,0.61,0.73,0.61,0.52,0.28,0.25,0.56,0.6,0.61,0.5,0.76,1.0,0.35,0.26,0.45,0.04,0.01,0.73,0.84,0.71,0.66,0.21,0.01,0.03,0.5,0.5,0.26,0.4,0.41,0.4,0.42,0.52,0.97,0.66,0.1,0.02,0.08,0.09,0.33,0.79,1.0,0.64,0.1,0.65,0.85,0.39,0.66,0.52,0.18,0.58,0.61,0.52,0.67,0.93,1.0,0.98,1.0,1.0,1.0,0.63,0.02,0.01,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.22,0.58,0.33,0.19,0.11,0.64,0.87,0.75,0.87,0.83,0.51,1.0,0.79,0.24,0.23,0.16,0.03,0.09,0.47,0.37,0.12,0.12,0.04,0.01,0.13,0.22,0.22,0.99,0.9,0.82,1.0,0.97,0.62,0.02,0.25,0.15,0.35,0.66,0.91,1.0,1.0,0.56,0.15,0.24,0.57,0.51,0.16,0.1,0.1,0.08,0.87,0.78,0.62,0.55,0.37,0.1,0.11,0.07,0.31,0.71,0.48,0.54,0.51,0.71,0.97,0.93,0.08,0.17,0.45,0.15,0.02,0.45,0.89,0.67,0.52,0.47,0.18,0.0,0.0,0.14,0.58,0.42,0.17,0.24,0.35,0.45,0.25,0.73,0.61,0.31,0.01,0.09,0.17,0.3,0.77,0.68,0.07,0.04,0.12,0.25,0.24,0.17,0.17,0.53,0.38,0.18,0.15,0.14,0.12,0.09,0.08,0.04,0.0],"s10.mp3":[0.04,0.04,0.32,0.29,0.62,0.68,0.64,0.63,0.83,1.0,1.0,1.0,1.0,0.63,0.1,0.65,0.87,0.67,0.67,0.67,0.73,0.79,0.68,0.44,0.06,0.04,0.03,0.28,0.63,0.49,0.23,0.39,0.16,0.03,0.21,0.35,0.8,0.79,0.1,0.12,0.38,0.29,0.63,0.94,0.71,0.36,0.41,0.38,0.24,0.25,1.0,0.85,0.07,0.11,0.37,0.38,0.23,0.56,0.65,0.54,0.43,0.43,0.27,0.44,0.76,0.4,0.27,0.29,0.14,0.32,0.35,0.33,0.11,0.21,0.57,1.0,0.88,0.08,0.04,0.35,0.36,0.23,0.14,0.28,0.45,0.45,0.17,0.06,0.04,0.03,0.04,0.06,0.03,0.05,0.04,0.04,0.03,0.03,0.03,0.03,0.03,0.04,0.04,0.02,0.03,0.04,0.03,0.0],"s11.mp3":[0.07,1.0,1.0,1.0,0.11,0.64,1.0,1.0,0.8,0.64,0.92,0.84,0.46,0.08,0.09,0.52,0.64,0.68,0.7,0.54,0.55,0.31,0.38,1.0,0.83,0.08,0.05,0.17,0.29,0.22,0.47,0.41,0.24,0.85,0.61,0.06,0.18,0.7,0.85,0.81,0.81,0.84,0.65,0.04,0.05,0.2,0.55,0.42,0.15,0.69,0.67,0.33,0.28,0.29,0.3,0.86,0.63,0.15,0.09,0.09,0.6,0.63,0.68,0.8,0.77,0.42,0.23,0.75,0.57,0.54,0.64,0.71,0.19,0.16,0.43,0.27,0.71,0.52,0.05,0.17,0.32,0.22,0.9,0.96,0.48,0.24,0.35,0.99,0.83,0.83,0.5,0.5,0.47,0.62,0.53,0.43,0.42,0.33,0.04,0.03,0.1,0.15,0.17,0.06,0.18,0.22,0.22,0.14,0.07,0.03,0.03,0.03,0.03,0.04,0.03],"s12.mp3":[0.05,0.05,0.05,0.06,0.05,0.06,0.06,0.55,1.0,1.0,0.76,0.86,0.83,0.13,0.38,0.24,0.57,0.91,0.09,0.08,0.34,0.33,0.76,1.0,0.51,0.47,0.29,0.06,0.06,0.86,0.86,0.14,0.15,0.8,0.98,0.7,0.76,0.43,0.49,0.16,0.52,1.0,1.0,0.73,0.3,0.84,0.81,0.55,0.56,0.85,0.58,0.27,0.26,0.5,0.62,0.86,0.9,0.63,0.36,0.27,0.05,0.05,0.65,0.76,0.72,0.37,0.23,0.66,0.61,0.53,0.48,0.86,0.18,0.37,0.27,0.39,0.97,1.0,1.0,1.0,0.27,0.16,0.68,0.54,0.44,0.29,0.12,0.06,0.05,0.05,0.05,0.04,0.05,0.04,0.05,0.05,0.05,0.04,0.06,0.05,0.05,0.07,0.41,0.54,0.25,0.69,0.28,0.19,0.92,1.0,0.62,0.55,0.25,0.28,0.47,0.88,0.64,0.09,0.64,0.64,0.61,0.69,0.73,0.63,0.53,0.34,0.51,0.36,0.56,0.73,0.91,1.0,0.35,0.39,0.87,0.66,0.52,0.32,0.35,0.3,0.52,0.38,0.35,0.27,0.2,0.16,0.19,0.38,0.48,0.41,0.36,0.06,0.07,0.07,0.19,0.27,0.28,0.22,0.14,0.07,0.05,0.07,0.04,0.06,0.05,0.05,0.04,0.05,0.04,0.05,0.05,0.04,0.05,0.05,0.04,0.05,0.04,0.05,0.05,0.05,0.0,0.0],"s13.mp3":[0.09,0.58,0.82,0.67,0.56,0.6,0.86,1.0,0.62,0.14,0.09,0.01,0.24,0.54,0.84,0.61,0.56,0.67,0.85,0.6,0.54,0.12,0.09,0.1,0.12,0.81,0.87,0.32,0.32,0.12,0.08,0.2,0.22,0.48,0.51,0.49,0.54,0.41,0.22,0.86,0.74,0.52,0.04,0.04,0.21,0.42,0.98,0.69,0.44,0.37,0.46,0.3,0.13,0.15,0.16,0.4,0.71,0.69,0.56,0.49,0.08,0.0,0.02,0.41,0.47,0.37,0.24,0.3,0.5,0.74,0.81,0.8,0.93,0.98,0.5,0.24,0.25,0.14,0.02,0.03,0.03,0.03,0.03,0.03,0.03,0.02,0.03,0.02,0.01,0.01,0.17,0.51,0.59,0.45,1.0,0.94,0.53,0.17,0.22,1.0,1.0,0.14,0.08,0.18,0.19,0.81,0.98,0.84,0.8,0.58,0.53,0.42,0.51,0.62,0.82,0.65,0.07,0.7,0.65,0.56,0.54,0.54,0.55,0.56,0.46,0.42,0.47,0.29,0.05,0.18,0.2,0.51,0.77,0.76,0.6,0.03,0.01,0.03,0.08,0.08,0.54,0.74,1.0,1.0,0.9,0.64,0.14,0.55,0.94,1.0,1.0,0.75,0.4,0.02,0.01,0.58,0.72,0.59,0.33,0.19,0.01,0.45,0.58,0.48,0.8,1.0,0.67,0.6,0.33,0.61,0.57,0.57,0.46,0.22,0.09,0.65,1.0,1.0,0.84,0.96,0.76,0.65,0.34,0.32,0.07,0.01,0.03,0.42,0.42,0.21,0.04,0.09,0.08,0.41,0.61,0.71,0.72,0.51,0.05,0.08,0.26,0.16,0.19,0.1,0.03,0.01],"s14.mp3":[0.03,0.02,0.03,0.03,0.15,0.66,0.7,0.1,0.11,0.33,0.38,0.97,0.36,0.05,0.21,0.36,0.99,0.72,0.36,0.37,0.35,0.24,0.19,0.05,0.15,0.08,0.84,0.91,0.64,0.98,0.2,0.06,0.22,0.34,0.65,0.8,0.19,0.86,0.95,0.6,0.28,0.4,0.53,0.67,0.72,0.59,0.53,0.41,0.19,0.54,0.88,0.57,0.06,0.05,0.13,0.36,0.28,0.97,1.0,0.76,0.55,0.47,0.54,0.34,0.65,0.97,0.55,0.03,0.2,0.22,1.0,0.8,0.82,0.79,0.63,0.91,0.86,0.67,0.14,0.09,0.13,0.14,0.5,0.71,0.53,0.41,0.35,0.06,0.03,0.08,0.38,0.33,0.09,0.1,0.11,0.15,0.41,0.77,1.0,1.0,1.0,0.2,0.27,1.0,1.0,1.0,0.76,0.23,0.32,0.55,0.5,0.39,0.27,0.13,0.34,0.53,0.5,0.38,0.44,0.91,0.7,0.09,0.1,0.26,0.22,0.51,0.68,0.35,0.34,0.3,0.31,0.39,0.37,0.31,0.14,0.02,0.33,0.17,0.09,0.21,0.28,0.26,0.25,0.21,0.09,0.03,0.04,0.03,0.03],"s15.mp3":[0.03,0.22,0.23,0.88,0.47,0.46,0.49,0.77,0.14,0.54,1.0,1.0,0.63,0.31,0.25,0.21,0.35,0.49,0.71,0.66,0.26,0.31,0.25,0.03,0.1,0.56,0.52,0.14,0.5,0.78,0.45,0.44,0.34,0.09,0.11,0.37,0.75,0.44,0.03,0.25,0.31,0.13,0.49,0.44,0.09,0.12,0.24,0.85,0.47,0.5,0.46,0.22,0.21,0.68,0.7,0.61,0.56,0.5,0.49,0.37,0.22,0.61,0.99,0.92,0.6,0.03,0.05,0.16,0.28,0.25,0.1,0.43,0.47,0.11,0.02,0.01,0.16,0.1,0.07,0.1,0.58,0.96,0.55,0.54,0.46,0.31,0.12,0.13,0.04,0.7,0.45,0.52,0.48,0.69,1.0,0.64,0.07,0.5,0.26,0.02,0.39,0.72,0.61,0.47,0.44,0.28,0.03,0.02,0.02,0.24,0.52,0.52,0.42,0.05,0.03,0.03,0.03,0.03,0.03,0.02,0.03,0.03,0.02,0.02,0.03,0.02,0.02,0.02,0.02,0.43,0.66,0.27,0.64,1.0,1.0,1.0,0.2,0.48,1.0,0.89,0.36,0.57,0.79,0.66,0.39,0.46,0.5,0.29,0.2,0.09,0.28,0.1,0.42,0.56,0.59,0.68,0.47,0.05,0.19,0.29,0.23,0.2,0.12,0.06,0.02,0.02,0.01,0.01,0.01,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.02,0.01,0.02,0.02,0.02,0.02,0.02,0.01,0.02,0.03,0.02,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.21,1.0,1.0,1.0,1.0,0.86,0.86,0.47,0.01,0.16,0.04,0.39,1.0,1.0,0.89,0.24,0.16,0.02,0.11,0.59,0.58,0.16,0.75,0.67,0.22,0.24,0.02,0.13,0.57,0.44,0.24,0.29,0.25,0.23,0.4,0.62,0.29,0.16,0.22,0.17,0.4,0.32,0.21,0.14,0.1,0.03,0.01],"s16.mp3":[0.01,0.61,0.92,0.98,0.52,0.14,0.15,0.29,0.13,0.01,0.55,1.0,0.66,0.49,0.48,0.19,0.08,0.07,0.36,0.43,0.06,0.01,0.18,0.2,0.27,0.55,0.33,0.09,0.11,0.17,0.8,0.5,0.41,0.3,0.16,0.24,0.5,0.49,0.42,0.3,0.4,0.38,0.16,0.3,0.65,0.56,0.26,0.01,0.07,0.23,0.22,0.41,0.41,0.42,0.31,1.0,0.71,0.71,0.82,0.9,0.68,0.4,0.44,0.33,0.03,0.15,0.21,0.24,0.76,0.73,0.63,0.03,0.01,0.02,0.06,0.07,0.23,0.55,1.0,1.0,0.81,0.18,0.47,1.0,1.0,1.0,0.79,0.43,0.04,0.01,0.01,0.01,0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.26,0.97,0.89,0.28,1.0,1.0,0.71,0.23,0.2,0.37,0.28,1.0,1.0,0.1,0.12,0.19,0.89,0.74,0.79,0.65,0.56,0.87,0.52,0.1,0.11,0.13,0.12,0.27,0.66,0.5,0.34,0.29,0.01,0.0,0.09,0.4,0.45,0.23,0.03,0.06,0.08,0.1,0.48,0.93,0.99,0.98,0.75,0.18,0.41,1.0,0.7,0.56,0.26,0.01,0.02,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.01,0.0,0.0,0.0,0.0,0.0,0.03,0.44,0.64,0.28,0.09,0.01,0.21,1.0,0.65,0.09,0.1,0.19,1.0,0.84,0.22,0.89,0.61,0.49,0.47,0.46,0.85,0.96,0.4,0.04,0.15,0.22,0.12,0.01,0.28,0.43,0.25,0.11,0.56,0.62,0.64,0.84,0.6,0.22,0.16,0.03,0.0,0.2,0.66,0.73,0.56,0.19,0.53,0.54,0.37,0.41,0.22,0.2,0.15,0.02,0.22,0.07,0.78,0.99,0.1,0.01,0.29,0.88,0.54,0.17,0.27,0.4,0.39,0.41,0.46,0.51,0.23,0.09,0.44,0.6,0.52,0.39,0.42,0.46,0.42,0.38,0.38,0.35,0.25,0.16,0.08,0.02,0.0],"s17.mp3":[0.36,0.39,0.38,0.39,0.4,0.4,0.36,0.81,0.86,0.84,0.56,0.43,0.45,0.82,1.0,0.91,0.8,0.89,1.0,0.6,0.43,0.59,0.46,0.4,0.42,0.44,0.84,0.69,0.62,0.66,0.71,0.6,0.52,0.55,0.64,0.72,0.69,0.78,0.53,0.6,0.51,0.4,0.42,0.42,0.81,0.69,0.65,0.7,0.48,0.38,0.42,0.41,0.38,0.39,0.42,0.39,0.39,0.4,0.39,0.4,0.4,0.39,0.41,0.39,0.4,0.42,0.76,1.0,1.0,0.78,0.65,1.0,0.96,0.56,0.45,0.66,0.73,0.64,0.69,0.72,0.5,0.48,0.66,0.91,0.91,0.83,0.55,0.58,0.41,0.42,0.55,0.44,0.44,0.46,1.0,1.0,0.47,0.41,0.48,0.55,0.56,0.64,0.99,1.0,0.88,0.79,0.53,0.51,0.5,0.52,0.6,0.82,0.65,0.44,0.54,0.66,0.85,0.88,0.64,0.43,0.43,0.52,0.6,0.49,0.47,0.46,0.44,0.67,0.94,1.0,1.0,1.0,0.61,0.44,0.79,0.96,0.98,0.91,0.57,0.41,0.43,0.42,0.39,0.4,0.41,0.39,0.41,0.4,0.39,0.41,0.39,0.41,0.41,0.59,0.84,0.9,0.55,0.52,0.88,0.83,0.65,0.51,0.53,0.56,0.56,0.62,0.8,0.51,0.42,0.48,0.45,1.0,0.88,0.76,0.72,0.75,0.78,0.7,0.51,0.42,0.42,0.42,0.67,0.76,0.65,0.57,0.48,0.44,0.44,0.53,0.49,0.43,0.47,0.43,0.62,0.79,0.79,0.67,0.49,0.42,0.71,0.67,0.64,0.53,0.55,0.62,0.59,0.43,0.45,0.41,0.44,0.41,0.43,0.4,0.4,0.4,0.38,0.38,0.4,0.38,0.38,0.4,0.38,0.39,0.39,0.4,0.38,0.39,0.14,0.0],"s18.mp3":[0.04,0.54,0.84,0.76,0.61,0.5,0.31,0.04,0.59,0.33,1.0,1.0,0.08,0.05,0.02,0.1,0.06,0.04,0.02,0.03,0.04,0.04,0.03,0.03,0.03,0.02,0.02,0.02,0.03,0.02,0.03,0.07,0.1,0.82,0.87,0.58,0.33,0.28,0.04,0.1,0.04,0.61,0.81,1.0,0.76,0.75,0.94,0.44,0.05,0.2,0.74,0.76,0.78,0.65,0.66,0.73,0.75,0.19,0.24,0.38,0.34,0.21,0.48,0.79,0.45,0.53,0.69,0.65,0.54,0.3,0.49,0.72,0.62,0.67,0.69,0.51,0.27,0.35,0.32,0.07,0.02,0.16,0.28,0.23,0.2,0.36,0.35,0.36,0.27,0.11,0.02,0.03,0.02,0.03,0.03,0.02,0.03,0.03,0.02,0.02,0.01,0.03,0.03,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.01,0.02,0.02,0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.03,0.03,0.03,0.03,0.04,0.03,0.03,0.52,0.78,0.87,0.98,1.0,1.0,1.0,1.0,1.0,0.22,0.38,0.8,0.67,0.31,0.41,1.0,1.0,1.0,0.64,0.22,0.68,0.81,0.18,0.05,0.27,0.63,0.89,0.31,0.32,0.75,1.0,0.71,0.4,0.37,0.31,0.36,0.08,0.34,1.0,1.0,1.0,0.94,0.45,0.03,0.3,0.21,0.32,0.29,0.3,0.3,0.64,0.57,0.09,0.18,0.82,0.91,0.65,0.55,0.52,0.2,0.29,0.33,0.23,0.38,0.46,0.29,0.2,0.27,0.43,0.42,0.25,0.18,0.28,0.69,0.81,0.74,0.34,0.32,0.56,0.96,0.88,0.67,0.03,0.41,0.29,0.79,0.52,0.43,0.45,0.56,0.4,0.36,0.43,0.38,0.05,0.33,0.61,0.5,0.79,0.56,0.39,0.48,0.66,0.43,0.41,0.5,0.33,0.05,0.1,0.13,0.24,0.37,0.3,0.16,0.12,0.08,0.05,0.03,0.03,0.17,0.13,0.03,0.04,0.04,0.03,0.03],"s19.mp3":[0.04,0.03,0.03,0.03,0.03,0.6,1.0,0.3,0.17,0.25,0.58,0.58,0.31,0.12,0.15,0.45,0.63,0.61,0.63,0.31,0.3,1.0,1.0,0.25,0.17,0.2,0.36,0.28,0.88,0.87,0.65,0.7,0.71,0.49,0.21,0.19,0.44,0.75,0.36,0.15,0.46,0.75,0.58,0.12,0.63,1.0,0.54,0.38,0.42,0.35,0.96,0.68,0.36,0.61,0.69,0.34,0.2,0.16,0.24,0.89,0.91,0.93,0.84,0.85,0.88,0.99,1.0,0.78,0.35,0.58,0.79,0.74,0.73,0.93,0.69,0.21,0.5,0.46,0.98,0.92,0.62,0.29,0.29,0.25,0.6,0.69,0.71,0.12,0.05,0.15,0.05,0.03,0.25,0.06,0.05,0.06,0.04,0.04,0.05,0.04,0.03,0.03,0.03,0.04,0.03,0.04,0.16,0.32,0.36,0.75,1.0,1.0,0.53,0.3,0.27,0.25,0.21,0.15,0.22,0.8,1.0,0.81,0.17,0.55,0.81,0.88,0.93,0.91,0.35,0.87,1.0,0.39,0.65,0.83,0.39,0.27,0.89,0.54,0.22,0.46,1.0,0.98,0.09,0.07,0.23,0.4,0.21,0.07,0.15,0.42,0.45,0.48,0.4,0.25,0.41,0.42,0.43,0.41,0.39,0.35,0.34,0.33,0.34,0.33,0.33,0.31,0.32,0.29,0.26,0.27,0.18,0.05,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.08,0.19,0.17,0.14,0.09,0.04,0.03,0.03,0.03,0.03,0.0],"s20.mp3":[0.09,0.41,0.68,0.3,0.1,0.49,0.3,0.76,1.0,1.0,1.0,1.0,0.72,0.13,0.3,0.05,0.07,0.33,0.63,0.49,0.56,0.61,0.5,0.47,0.5,0.59,0.52,0.02,0.01,0.18,0.56,0.85,0.99,0.18,0.23,0.36,0.29,0.22,0.54,0.39,0.42,0.66,0.7,0.64,0.65,0.8,0.75,0.07,0.03,0.26,0.55,0.55,0.2,0.33,0.63,0.82,0.44,0.21,0.2,0.17,0.14,0.03,0.01,0.02,0.04,0.03,0.03,0.03,0.02,0.02,0.01,0.01,0.0,0.0,0.0,0.01,0.75,1.0,0.88,0.5,1.0,0.93,0.44,0.27,0.42,0.44,0.44,0.51,0.55,0.42,0.07,0.31,0.52,0.41,0.45,0.43,0.29,0.56,1.0,0.34,0.5,0.68,0.49,0.02,0.62,0.76,0.19,0.06,0.02,0.02,0.17,0.65,0.5,0.63,0.59,0.17,0.48,0.93,0.83,0.41,0.25,0.19,0.47,0.42,0.38,0.45,0.58,0.43,0.03,0.02,0.18,0.3,0.69,1.0,1.0,0.94,0.79,0.5,0.49,0.42,0.28,0.31,0.74,0.85,1.0,0.96,0.15,0.56,0.65,0.07,0.44,0.65,0.36,0.63,0.59,0.32,0.95,0.88,0.91,0.66,0.28,0.03,0.47,0.6,0.39,0.34,0.23,0.02,0.25,0.22,0.14,0.12,0.09,0.08,0.03,0.0],"s21.mp3":[0.03,0.63,0.11,0.14,0.8,0.92,0.56,0.66,0.69,0.86,0.51,0.02,0.17,0.41,1.0,0.7,0.36,0.57,0.39,0.17,0.71,0.89,0.86,0.88,0.71,0.96,0.23,0.02,0.25,0.45,0.4,0.09,0.62,0.9,0.31,0.21,0.2,0.13,0.01,0.17,0.19,0.72,0.93,0.91,0.35,0.02,0.02,0.0,0.28,0.85,0.34,0.3,0.21,0.01,0.3,0.66,0.93,0.98,1.0,1.0,1.0,0.65,0.07,0.06,0.04,0.01,0.01,0.59,0.57,0.5,0.31,0.27,0.71,0.79,0.38,0.17,1.0,1.0,0.59,0.05,0.15,0.17,0.44,0.79,0.69,0.16,0.2,0.26,0.4,0.36,0.4,0.39,0.15,0.01,0.06,0.22,0.26,0.05,0.74,0.84,0.71,0.69,0.74,0.62,0.36,0.34,0.86,1.0,1.0,0.81,0.34,1.0,0.69,0.1,0.22,1.0,0.48,0.1,0.36,1.0,0.42,0.08,0.4,0.72,0.67,0.22,0.16,0.35,0.38,0.28,0.18,0.61,0.61,0.73,0.71,0.52,0.16,0.15,0.06,0.0,0.07,0.74,0.76,0.69,0.43,0.17,0.62,0.94,0.59,0.47,0.41,0.08,0.02,0.03,0.03,0.03,0.03,0.02,0.02,0.02,0.01,0.01,0.01,0.01,0.0,0.0,0.0,0.0,0.0,0.28,0.85,0.61,0.74,1.0,0.93,0.39,0.41,0.46,0.53,0.63,0.34,0.02,0.33,0.64,0.84,1.0,0.86,0.22,0.16,0.05,0.0,0.05,0.71,0.78,0.77,0.45,0.16,0.77,0.91,0.44,0.39,0.2,0.27,0.3,0.37,0.31,1.0,0.82,0.07,0.03,0.07,0.1,0.21,0.76,0.98,0.54,0.05,0.14,0.56,0.48,0.39,0.58,0.67,0.84,0.45,0.09,0.08,0.08,0.21,0.26,0.16,0.15,0.17,0.22,0.24,0.11,0.18,0.17,0.21,0.2,0.14,0.02,0.0,0.06,0.12,0.01,0.0],"s22.mp3":[0.41,0.45,0.43,0.43,0.48,0.44,0.47,0.81,1.0,1.0,0.64,0.6,0.55,1.0,0.97,0.54,0.76,1.0,1.0,0.9,0.79,0.68,0.61,0.6,0.57,0.74,0.9,0.99,1.0,1.0,0.7,0.53,0.66,0.55,0.47,0.48,0.8,0.84,0.49,0.54,0.74,0.47,0.65,0.98,0.71,0.52,0.57,0.86,0.9,0.71,0.65,0.65,0.47,0.53,0.6,0.86,1.0,0.76,0.49,0.52,0.54,0.77,0.65,0.62,0.66,0.68,0.97,0.75,0.53,0.66,0.82,1.0,1.0,0.53,0.5,0.69,0.68,0.81,0.82,0.74,0.69,0.53,0.48,0.5,0.45,0.43,0.45,0.45,0.45,0.44,0.44,0.46,0.46,0.43,0.47,0.46,0.49,0.54,0.88,0.75,0.58,0.54,0.51,0.49,0.66,0.84,0.94,0.86,0.54,0.8,0.88,0.77,0.68,0.61,0.55,0.5,0.48,0.49,0.85,1.0,1.0,1.0,0.66,0.49,0.49,0.58,0.74,0.79,0.61,0.58,0.58,0.6,0.54,0.54,0.57,0.61,0.55,0.5,0.57,0.47,0.48,0.73,0.8,0.87,0.55,0.58,0.75,1.0,0.54,0.48,0.65,0.95,0.95,0.9,0.92,0.5,0.52,0.79,0.53,0.48,0.47,0.62,0.9,0.85,0.75,0.57,0.54,0.53,0.51,0.77,0.91,0.61,0.58,0.56,0.64,0.83,0.55,0.61,0.75,0.8,0.9,0.97,0.75,0.69,0.61,0.5,0.51,0.68,0.71,0.59,0.61,0.5,0.53,0.67,0.65,0.47,0.49,0.6,0.78,0.84,0.81,0.85,0.88,0.85,0.99,1.0,0.52,0.51,0.97,0.96,0.9,0.83,0.83,0.92,0.9,0.54,0.45,0.55,0.48,0.55,0.61,0.49,0.73,0.86,0.77,0.8,0.79,0.73,0.63,0.68,0.61,0.48,0.45,0.48,0.45,0.44,0.45,0.45,0.43,0.44,0.44,0.44,0.45,0.44,0.46,0.45,0.45,0.46,0.45,0.45,0.4,0.0,0.0],"s23.mp3":[0.03,0.7,0.96,0.62,0.33,0.2,0.43,0.72,0.78,0.61,0.61,0.48,0.71,0.91,0.49,0.76,0.41,0.02,0.52,1.0,1.0,0.95,0.25,0.18,0.09,0.45,0.68,0.72,0.51,0.6,0.67,0.47,0.84,0.3,0.02,0.68,0.9,0.91,0.91,0.44,0.04,0.11,0.33,0.46,0.44,0.32,0.38,0.89,0.59,0.06,0.3,0.21,0.2,0.84,0.83,0.63,0.23,0.13,0.16,0.11,0.83,0.8,0.52,0.46,0.35,0.15,0.27,0.64,0.3,0.14,1.0,1.0,0.15,0.11,0.16,0.02,0.08,0.33,0.9,0.83,0.38,0.34,0.35,0.28,0.14,0.04,0.5,0.74,1.0,1.0,0.6,0.61,0.26,0.03,0.18,0.6,1.0,0.47,0.29,0.24,0.35,0.47,0.35,0.29,0.14,0.12,0.16,0.43,0.76,0.64,0.11,0.09,0.1,0.02,0.29,0.29,0.24,0.14,0.25,0.37,0.4,0.18,0.03,0.01],"s24.mp3":[0.04,0.36,0.98,1.0,0.84,0.68,0.77,1.0,0.69,0.95,1.0,0.73,0.15,0.15,0.07,0.03,0.4,0.26,0.37,1.0,1.0,0.63,0.7,0.8,0.67,0.62,0.53,0.33,0.35,0.06,0.39,0.89,0.63,0.36,0.57,1.0,1.0,0.84,0.16,0.14,0.1,0.03,0.48,0.71,0.69,0.58,0.59,0.66,0.4,0.21,0.62,0.59,0.44,0.1,0.04,0.04,0.04,0.04,0.04,0.03,0.03,0.03,0.02,0.03,0.03,0.1,0.52,0.81,0.65,0.74,0.84,0.8,1.0,1.0,0.85,0.09,0.05,0.11,0.15,0.1,0.47,0.85,0.94,0.45,0.21,0.95,0.52,0.11,0.1,0.52,0.95,0.46,0.15,0.4,0.18,0.02,0.39,0.98,0.94,0.41,0.22,0.39,0.81,0.83,0.69,0.63,0.75,0.63,0.52,0.46,0.49,0.72,0.66,0.3,0.14,0.09,0.49,0.39,0.24,0.05,0.37,0.38,0.34,0.21,0.18,0.1,0.07,0.08,0.07,0.05,0.05,0.05,0.05,0.04,0.03,0.02,0.04,0.03,0.03,0.03,0.03,0.03,0.02,0.03,0.03,0.03,0.03,0.03,0.04,0.02,0.03,0.03,0.03,0.03,0.04,0.03,0.03],"s25.mp3":[0.04,0.03,0.05,0.04,0.04,0.11,0.47,0.59,0.49,0.81,0.76,0.05,0.81,1.0,1.0,0.92,0.81,0.29,0.4,0.18,0.12,0.54,0.74,0.58,0.51,0.38,0.08,0.14,0.14,0.38,0.77,1.0,1.0,0.38,0.14,0.44,0.89,1.0,0.4,0.12,0.83,0.77,0.11,0.19,0.46,0.53,0.5,0.59,0.61,0.25,0.13,0.13,0.12,0.12,0.81,1.0,0.99,0.36,0.35,0.31,0.28,0.2,0.04,0.14,0.11,0.09,0.06,0.06,0.04,0.05,0.04,0.03,0.04,0.04,0.12,0.23,0.27,0.86,1.0,0.91,0.82,0.73,0.84,0.98,1.0,0.84,0.32,0.25,0.04,0.3,0.72,0.51,0.41,0.3,0.09,0.15,0.14,0.38,0.66,0.93,0.79,0.13,0.55,0.91,0.22,0.15,0.26,0.16,0.89,0.84,0.09,0.09,0.22,0.38,0.76,1.0,0.92,0.33,0.27,0.25,0.25,0.2,0.38,0.45,0.43,0.17,0.27,0.41,0.72,0.37,0.34,0.41,0.78,0.93,0.64,0.27,0.09,0.18,0.5,0.23,0.15,0.13,0.08,0.87,0.88,0.72,0.55,0.5,0.46,0.29,0.04,0.15,0.42,0.33,0.99,1.0,1.0,0.38,0.14,0.53,0.26,0.04,0.43,0.66,0.52,0.06,0.05,0.1,0.14,0.31,0.39,0.35,0.32,0.25,0.08,0.11,0.24,0.22,0.11,0.05,0.03,0.04,0.04,0.04,0.03,0.04,0.03,0.03,0.07,0.02,0.09,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.04,0.03,0.03,0.04,0.02,0.0],"s26.mp3":[0.01,0.23,0.32,0.34,0.93,1.0,1.0,1.0,0.42,0.29,1.0,1.0,0.91,0.25,0.02,0.05,0.18,0.44,0.91,0.88,0.91,1.0,1.0,0.28,0.16,0.02,0.07,0.33,0.61,0.42,0.46,0.45,0.42,0.45,0.37,0.1,0.11,0.1,0.07,0.01,0.0,0.0,0.07,0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.01,0.54,0.54,0.51,0.21,0.48,1.0,0.92,0.33,0.04,0.41,0.4,0.3,0.02,0.22,0.12,0.51,0.6,0.61,0.55,0.58,0.57,0.54,0.5,0.4,0.12,0.01,0.0,0.0,0.27,0.78,0.39,0.07,0.43,1.0,0.24,0.01,0.28,0.13,0.6,0.68,0.44,0.44,0.23,0.19,0.02,0.1,0.05,0.37,0.47,0.37,0.4,0.45,0.36,0.14,0.64,0.74,1.0,0.6,0.18,0.12,0.02,0.0,0.12,0.63,0.67,0.53,0.26,0.16,0.36,0.25,0.26,0.21,0.13,0.15,0.06,0.06,0.63,0.11,0.01,0.11,0.42,0.52,0.59,0.11,0.01,0.2,0.19,0.3,0.21,0.1,0.11,0.08,0.02,0.0],"s27.mp3":[0.02,0.14,0.03,0.01,0.98,1.0,1.0,0.95,0.08,0.4,0.91,1.0,1.0,0.37,0.56,0.12,0.02,0.69,0.97,0.8,0.84,0.88,0.59,0.54,0.28,0.68,1.0,0.33,0.14,0.81,0.71,0.72,0.89,0.63,0.03,0.31,0.34,0.54,0.49,0.08,0.01,0.5,0.75,0.79,0.74,0.22,0.36,0.94,0.67,0.51,0.45,0.81,0.64,0.56,0.53,0.63,0.54,0.54,0.57,0.47,0.02,0.2,0.33,0.51,0.51,0.32,0.18,0.16,0.05,0.43,0.68,0.76,0.54,0.11,0.11,0.08,0.01,0.19,0.4,0.54,0.55,0.48,0.49,0.24,0.04,0.45,0.54,0.45,0.19,0.01,0.43,0.98,0.8,0.29,1.0,0.66,0.53,0.06,0.01,0.36,0.44,0.5,0.44,0.12,0.06,0.09,0.1,0.59,1.0,1.0,0.67,0.17,0.57,0.61,0.41,0.42,0.04,0.14,0.36,0.71,0.67,0.19,0.14,0.41,0.58,0.83,0.71,0.44,0.27,0.06,0.24,0.35,0.41,0.26,0.08,0.07,0.07,0.05,0.06,0.17,0.16,0.12,0.12,0.08,0.01,0.0],"s28.mp3":[0.03,0.04,0.04,0.03,0.04,0.03,0.05,0.93,1.0,1.0,1.0,0.22,0.83,1.0,0.86,0.66,0.51,0.87,0.46,0.19,0.53,0.86,0.74,0.12,0.15,0.96,1.0,0.89,0.48,0.48,0.42,0.3,1.0,0.92,0.87,0.53,0.06,0.32,0.58,0.06,0.27,0.97,0.91,0.6,0.07,0.05,0.29,0.33,0.42,0.36,0.37,0.17,0.15,0.37,0.75,0.92,0.78,0.52,0.56,0.46,0.15,0.12,0.19,0.48,0.77,0.88,0.77,0.65,0.72,0.83,0.64,0.61,0.32,0.28,0.08,0.42,0.73,0.27,0.19,0.97,0.87,0.8,0.71,0.34,0.4,0.46,0.53,0.56,0.62,0.42,0.32,0.32,0.26,0.17,0.63,0.83,0.79,0.8,0.25,0.85,0.91,0.75,0.52,0.53,0.41,0.22,0.15,0.11,0.18,0.35,0.93,0.85,0.84,0.9,0.59,0.1,0.66,0.6,0.58,0.48,0.19,0.67,0.72,0.79,0.71,0.72,0.48,0.06,0.07,0.32,0.49,0.45,0.39,0.13,0.12,0.05,0.04,0.04,0.03,0.03,0.03,0.03,0.03,0.04,0.16,0.24,0.59,0.82,0.66,0.58,0.44,0.53,0.62,0.41,0.24,0.83,1.0,1.0,0.87,0.23,0.4,0.69,0.19,0.05,0.4,0.4,0.56,1.0,1.0,1.0,0.65,0.06,0.06,0.04,0.28,0.34,0.3,0.22,0.05,0.03,0.03,0.04,0.34,0.32,0.63,0.88,0.84,1.0,0.84,0.96,1.0,1.0,0.86,0.18,0.53,0.93,0.61,0.57,0.6,0.59,0.39,0.33,0.31,0.31,0.23,0.07,0.07,0.1,0.15,0.76,1.0,1.0,0.95,0.85,0.67,0.4,0.31,0.59,0.73,0.77,0.88,0.5,0.05,0.3,0.31,0.09,0.05,0.13,0.63,0.88,0.9,0.84,0.8,0.85,0.64,0.3,0.39,0.38,0.29,0.64,0.72,0.78,0.85,0.89,0.33,0.06,0.3,0.22,0.44,0.34,0.2,0.25,0.06,0.18,0.66,0.95,0.54,0.21,0.94,0.73,0.39,0.33,0.1,0.26,0.42,0.35,0.37,0.27,0.04,0.11,0.26,0.44,0.39,0.34,0.31,0.22,0.05,0.13,0.13,0.04,0.04,0.05,0.03,0.04,0.04,0.04,0.04,0.05,0.04,0.04,0.04,0.03,0.04,0.04,0.04,0.04,0.03,0.0],"s29.mp3":[0.08,0.97,1.0,0.66,0.7,0.76,0.15,0.11,0.13,0.59,1.0,0.21,0.01,0.13,0.55,0.93,0.99,0.49,0.02,0.27,0.9,0.72,0.68,0.64,0.27,0.75,1.0,0.36,0.32,0.03,0.17,1.0,0.48,0.03,0.14,0.24,0.8,0.51,0.21,0.27,0.11,0.49,0.58,0.57,0.18,0.06,0.24,0.34,0.54,0.65,0.56,0.31,0.35,0.68,0.14,0.52,0.54,0.28,0.24,0.23,0.49,0.73,0.68,0.33,0.15,1.0,0.83,0.12,0.11,0.09,0.54,0.63,0.15,0.01,0.26,0.15,0.09,0.19,0.24,0.26,0.12,0.1,0.07,0.01,0.0,0.0,0.0,0.01,0.03,0.04,0.02,0.01],"s30.mp3":[0.3,0.32,0.31,0.31,0.37,0.38,0.7,0.9,1.0,0.96,0.94,0.97,0.55,0.33,0.39,0.59,0.89,0.85,0.82,0.42,0.64,0.87,0.55,0.53,0.42,0.34,0.35,0.94,0.55,0.39,0.62,1.0,0.77,0.8,0.79,0.7,0.66,0.64,0.37,0.38,0.59,0.54,0.5,0.38,0.34,0.35,0.32,0.32,0.33,0.33,0.32,0.33,0.3,0.32,0.3,0.31,0.31,0.31,0.31,0.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.01,0.03,0.08,0.05,0.06,0.04,0.05,0.1,0.87,1.0,1.0,0.62,0.68,0.72,0.65,0.69,1.0,1.0,1.0,1.0,0.76,0.58,0.73,1.0,0.67,0.05,0.55,0.8,0.39,0.56,0.33,0.09,0.67,1.0,0.83,0.74,0.39,0.22,0.39,0.55,0.53,0.5,0.32,0.47,0.75,0.14,0.47,0.85,0.39,0.09,0.27,0.89,0.91,0.41,0.27,0.38,0.71,0.67,0.46,0.49,0.7,0.73,0.68,0.54,0.76,0.75,0.31,0.04,0.08,0.07,0.29,0.29,0.36,0.36,0.33,0.33,0.3,0.23,0.27,0.2,0.14,0.09,0.08,0.03,0.04,0.04,0.03,0.03,0.04,0.03,0.04,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.03,0.04,0.03,0.04,0.04,0.03,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.26,0.3,0.3,0.32,0.31,0.31,0.34,0.42,0.83,0.87,0.97,0.6,0.36,0.25,0.27,0.33,0.81,1.0,1.0,1.0,0.97,0.97,1.0,0.84,0.53,0.36,0.35,0.57,0.71,0.53,0.27,0.3,0.37,0.43,0.92,0.93,0.51,0.41,0.35,0.37,0.36,0.57,0.84,0.57,0.4,0.4,0.41,0.41,0.37,0.34,0.34,0.35,0.34,0.35,0.35,0.35,0.35,0.35,0.35,0.34,0.34,0.16,0.0]};
-const player=new Audio(); player.preload="auto"; player.setAttribute("playsinline","");
-const fileOf=i=>"audio/s"+String(i+1).padStart(2,"0")+".mp3";
-let muted=false, playing=false, paused=false, cur=0, endIdx=ITEMS.length, curCh=-1, token=0, timer=null, audioOK=true;
-function unlockAudio(){try{player.muted=true;player.src=fileOf(0);const p=player.play();if(p)p.then(()=>{player.pause();player.muted=false;}).catch(()=>{player.muted=false;});}catch(e){}}
-// nächste Datei vorab laden, damit es zwischen den Sätzen keine Pause gibt
-const pre=new Audio(); pre.preload="auto";
+/* =================== Ablauf (Sätze auf der Tonspur) =================== */
 const sub=document.getElementById("sub"), card=document.getElementById("card"), chipsEl=document.getElementById("chips");
-const playB=document.getElementById("play"), muteB=document.getElementById("mute");
-CH.forEach((c,i)=>{const b=document.createElement("button");b.textContent=c.t;b.onclick=()=>start(firstOf(i),firstOf(i)+c.s.length);chipsEl.appendChild(b);});
+const playB=document.getElementById("play"), muteB=document.getElementById("mute"), langB=document.getElementById("langB");
+let muted=false, playing=false, paused=false, cur=0, endIdx=ITEMS.length, curCh=-1, endT=0, poll=null, simT=null, pendingSeek=null, seekTries=0;
+function renderChips(){chipsEl.innerHTML="";CH.forEach((c,i)=>{const b=document.createElement("button");b.textContent=chapterTitle(i);
+  b.onclick=()=>start(firstOf(i),firstOf(i)+c.s.length);chipsEl.appendChild(b);});curCh=-1;}
 function showChapter(ci){if(ci===curCh)return;curCh=ci;const c=CH[ci];
-  card.innerHTML=c.card?CARDS[c.card]:"";card.dataset.off=c.card?"0":"1";if(c.wave)cue.wave=1.8;cue.brow=1;
+  card.innerHTML=c.card?cardHtml(c.card):"";card.dataset.off=c.card?"0":"1";if(c.wave)cue.wave=1.8;cue.brow=1;
   [...chipsEl.children].forEach((b,i)=>b.setAttribute("aria-current",i===ci));
-  chipsEl.children[ci].scrollIntoView({block:"nearest",inline:"center",behavior:reduce?"auto":"smooth"});}
-function beginSentence(i){cur=i;const it=ITEMS[i];showChapter(it.c);sub.hidden=false;sub.textContent=it.s;
-  sp.text=it.s;sp.syncChar=0;sp.syncT=performance.now();sp.cps=14.5;sp.on=true;cue.brow=Math.max(cue.brow,.6);}
-function endSentence(){sp.on=false;cue.nod=1;}
-function start(from,to=ITEMS.length){halt();playing=true;paused=false;endIdx=to;playB.textContent="Pause";curCh=-1;speakFrom(from);}
-function resumeAt(i){halt();playing=true;paused=false;playB.textContent="Pause";speakFrom(i);}
-function speakFrom(from){const my=++token;
-  if(!muted&&audioOK){
-    const playItem=i=>{if(my!==token)return;if(i>=endIdx){finish();return;}
-      beginSentence(i); const f=fileOf(i); sp.env=ENV[f.slice(6)]; sp.audio=true;
-      if(!player.src.endsWith(f))player.src=f; player.currentTime=0; player.muted=false;
-      if(i+1<ITEMS.length)pre.src=fileOf(i+1);
-      player.onended=()=>{if(my!==token)return;endSentence();
-        timer=setTimeout(()=>playItem(i+1),ITEMS[i+1]&&ITEMS[i+1].c!==ITEMS[i].c?650:220);};
-      const p=player.play();
-      if(p)p.catch(err=>{if(my!==token)return;
-        if(err&&err.name==="NotAllowedError"){halt();playing=false;askTap();}
-        else{audioOK=false;speakFrom(i);}});};
-    playItem(from);
-  } else {
-    const stepTo=i=>{if(my!==token)return;if(i>=endIdx){finish();return;}beginSentence(i);sp.audio=false;
-      const ms=ITEMS[i].s.length/14.5*1000+150;
-      timer=setTimeout(()=>{if(my!==token)return;endSentence();timer=setTimeout(()=>stepTo(i+1),ITEMS[i+1]&&ITEMS[i+1].c!==ITEMS[i].c?650:280);},ms);};
-    stepTo(from);}
+  chipsEl.children[ci]?.scrollIntoView({block:"nearest",inline:"center",behavior:reduce?"auto":"smooth"});}
+function now(){return TRACK?player.currentTime:(performance.now()-simT)/1000;}
+function times(i){if(TRACK)return TRACK.t[i];let t=0;for(let k=0;k<i;k++)t+=sentence(k).length/14.5+.3;return [t,t+sentence(i).length/14.5];}
+function setSentence(i){if(i!==cur||sub.hidden){cur=i;showChapter(ITEMS[i].c);sub.hidden=false;sub.textContent=sentence(i);cue.brow=Math.max(cue.brow,.6);}
+  const [a,b]=times(i);sp.text=sentence(i);sp.t0=a;sp.t1=b;}
+function tick(){if(!playing||paused)return;
+  if(pendingSeek!==null&&TRACK){            // Springen, sobald die Datei bereit ist (iPhone ignoriert frühe Sprünge)
+    if(player.readyState>=1){if(Math.abs(player.currentTime-pendingSeek)>.35&&seekTries++<60){try{player.currentTime=pendingSeek;}catch(e){}return;}}
+    else return;
+    pendingSeek=null;}
+  const t=now();
+  if(t>=endT){finish();return;}
+  let i=cur;while(i+1<ITEMS.length&&t>=times(i+1)[0]-.05)i++;while(i>0&&t<times(i)[0]-.3)i--;
+  if(i!==cur||sub.hidden){if(cur<i&&sp.on)cue.nod=1;setSentence(i);}
+  const [a,b]=times(cur);const on=t>=a&&t<=b+.05;if(sp.on&&!on)cue.nod=1;sp.on=on;}
+function start(from,to=ITEMS.length){halt();playing=true;paused=false;endIdx=to;curCh=-1;playB.textContent=tx("pause");
+  setSentence(from);endT=times(to-1)[1]+.25;
+  if(TRACK||player.src){player.muted=muted;const st=times(from)[0]-.05;
+    pendingSeek=Math.max(0,st);seekTries=0;if(player.readyState>=1){try{player.currentTime=pendingSeek;}catch(e){}}
+    const p=player.play();
+    if(p)p.catch(err=>{if(err&&err.name==="NotAllowedError"){halt();playing=false;askTap(()=>start(from,to));}});
+    if(!TRACK)simT=performance.now()-st*1000;}
+  poll=setInterval(tick,40);}
+function halt(){clearInterval(poll);try{player.pause();}catch(e){}sp.on=false;}
+function finish(){halt();playing=false;playB.textContent=tx("again");card.dataset.off="1";sub.textContent=tx("done");}
+playB.onclick=()=>{if(!playing){start(0);return;}
+  if(!paused){halt();paused=true;playB.textContent=tx("resume");}
+  else{paused=false;playB.textContent=tx("pause");player.muted=muted;player.play().catch(()=>{});poll=setInterval(tick,40);}};
+muteB.onclick=()=>{muted=!muted;player.muted=muted;applyLang();};
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.querySelectorAll("[data-i]").forEach(el=>{const v=UI[LANG][el.dataset.i];if(v)el.innerHTML=v;});
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===LANG));
+  langB.textContent=LANG==="de"?"EN":"DE"; muteB.textContent=muted?tx("unmute"):tx("mute"); muteB.setAttribute("aria-pressed",muted);
+  tapSound.textContent=tx("tap"); replaceB.textContent=tx("replace");
+  if(!playing)playB.textContent=tx("play"); else playB.textContent=paused?tx("resume"):tx("pause");
+  renderChips(); if(playing||!sub.hidden){showChapter(ITEMS[cur].c);sub.textContent=sentence(cur);}
+  if(typeof refreshHint==="function")refreshHint();
 }
-function halt(){token++;clearTimeout(timer);try{player.pause();}catch(e){}sp.on=false;}
-function finish(){halt();playing=false;playB.textContent="Nochmal";card.dataset.off="1";sub.textContent="Das war's! Tippe ein Thema an, um es noch einmal zu hören.";}
-function setMuted(v){muted=v;muteB.setAttribute("aria-pressed",v);}
-playB.onclick=()=>{if(!playing){start(0);return;} if(!paused){halt();paused=true;playB.textContent="Weiter";} else resumeAt(cur);};
-muteB.onclick=()=>{setMuted(!muted);if(playing&&!paused)resumeAt(cur);};
+function setLang(l){if(l===LANG)return;LANG=l;const was=playing&&!paused, at=cur;
+  halt(); setTrack(); applyLang(); if(was)start(at,endIdx);}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+langB.onclick=()=>setLang(LANG==="de"?"en":"de");
 
 /* =================== Modus-Steuerung =================== */
-const startEl=document.getElementById("start"), arEl=document.getElementById("ar"), hud=document.getElementById("hud");
-const statusEl=document.getElementById("status"), scanHint=document.getElementById("scanHint"), scanText=document.getElementById("scanText");
-const replaceB=document.getElementById("replace");
-let mode=null, stopMode=null, sizeK=1, applySize=()=>{}, wake=null;
+const startEl=document.getElementById("start"), gate=document.getElementById("gate"), arEl=document.getElementById("ar"), hud=document.getElementById("hud");
+const statusEl=document.getElementById("status"), scanHint=document.getElementById("scanHint"), scanText=document.getElementById("scanText"), frameEl=document.getElementById("frame");
+const replaceB=document.getElementById("replace"), switchB=document.getElementById("switchMode"), tapSound=document.getElementById("tapSound");
+let mode=null, stopMode=null, sizeK=1, applySize=()=>{}, wake=null, hintKey=null, statusKey=null, tapCb=null;
+function setStatus(k){statusKey=k;statusEl.textContent=k?tx(k):"";}
+function setHint(k,frame){hintKey=k;scanHint.hidden=!k;if(k)scanText.textContent=tx(k);frameEl.hidden=!frame;}
+function refreshHint(){if(hintKey)scanText.textContent=tx(hintKey);if(statusKey)statusEl.textContent=tx(statusKey);
+  switchB.textContent=mode==="card"?tx("toFree"):tx("toCard");}
+function askTap(cb){tapCb=cb;tapSound.hidden=false;tapSound.textContent=tx("tap");}
+tapSound.onclick=()=>{tapSound.hidden=true;const cb=tapCb;tapCb=null;if(cb)cb();};
 async function keepAwake(){try{wake=await navigator.wakeLock?.request("screen");}catch(e){}}
-function enterHud(m){mode=m;startEl.hidden=true;hud.hidden=false;sub.hidden=true;card.dataset.off="1";keepAwake();}
-function leave(){halt();playing=false;sp.on=false;needTap=false;tapSound.hidden=true;if(stopMode)stopMode();stopMode=null;mode=null;
-  arEl.hidden=true;arEl.innerHTML="";hud.hidden=true;startEl.hidden=false;scanHint.hidden=false;replaceB.hidden=true;
-  try{wake&&wake.release();}catch(e){} previewOn=true; pResize();}
+function enterHud(m){mode=m;autoStarted=false;startEl.hidden=true;gate.hidden=true;hud.hidden=false;sub.hidden=true;card.dataset.off="1";previewOn=false;
+  switchB.hidden=!(m==="card"||m==="gyro");replaceB.hidden=true;refreshHint();keepAwake();}
+function stopCurrent(){halt();playing=false;sp.on=false;tapSound.hidden=true;tapCb=null;if(stopMode)stopMode();stopMode=null;arEl.innerHTML="";}
+function leave(){stopCurrent();mode=null;arEl.hidden=true;hud.hidden=true;startEl.hidden=false;
+  try{wake&&wake.release();}catch(e){} previewOn=true; pResize(); playB.textContent=tx("play");}
 document.getElementById("exit").onclick=leave;
 document.getElementById("bigger").onclick=()=>{sizeK=Math.min(4,sizeK*1.25);applySize();};
 document.getElementById("smaller").onclick=()=>{sizeK=Math.max(.25,sizeK/1.25);applySize();};
+switchB.onclick=()=>{const m=mode;stopCurrent();if(m==="card")startFree();else startCard();};
+let autoStarted=false;
+const talkWhenReady=()=>{if(!autoStarted&&!playing){autoStarted=true;start(0);}};
 
-/* --- Modus 1: Karten-Tracking (iPhone & Android) --- */
-const tapSound=document.getElementById("tapSound");
-let needTap=false, onSoundReady=null;
-function soundTap(e){if(!needTap)return;if(e&&e.target&&e.target.closest&&e.target.closest("#exit"))return;
-  if(e&&e.type==="click"&&e.target!==tapSound){e.stopPropagation();e.preventDefault();}
-  needTap=false;tapSound.hidden=true;document.removeEventListener("click",soundTap,true);
-  start(0);if(onSoundReady)onSoundReady();}
-function askTap(){needTap=true;tapSound.hidden=false;document.addEventListener("click",soundTap,true);}
+async function openCamera(){
+  const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+  const v=document.createElement("video");v.className="camfeed";v.setAttribute("playsinline","");v.muted=true;v.autoplay=true;v.srcObject=s;arEl.appendChild(v);await v.play();return {v,s};
+}
+function camError(err){console.error(err);setStatus(null);
+  setHint(location.protocol!=="https:"&&location.hostname!=="localhost"?"https":"noCam",false);}
 
-document.getElementById("goCard").onclick=()=>startCard(false);
-async function startCard(auto){
-  if(!auto){start(0);} else askTap();
-  previewOn=false; enterHud("card"); arEl.hidden=false;
-  statusEl.textContent="Kamera startet …"; scanHint.hidden=false; scanText.textContent="Richte die Kamera auf das Lia-Bild der Karte.";
+/* --- Ohne Karte: Android mit ARCore = echte Flächenerkennung, sonst Lagesensor --- */
+let xrOK=false;
+if(navigator.xr&&navigator.xr.isSessionSupported){navigator.xr.isSessionSupported("immersive-ar").then(ok=>{xrOK=ok;}).catch(()=>{});}
+function startFree(){ if(xrOK)startXR(); else startGyro(); }
+
+async function startXR(){
+  let session;
+  try{session=await navigator.xr.requestSession("immersive-ar",{requiredFeatures:["hit-test"],optionalFeatures:["dom-overlay"],domOverlay:{root:hud}});}
+  catch(e){startGyro();return;}
+  enterHud("xr");arEl.hidden=false;arEl.style.background="transparent";
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(devicePixelRatio);renderer.setSize(innerWidth,innerHeight);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;renderer.xr.enabled=true;arEl.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();addLights(scene);const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.01,30);
+  const reticle=new THREE.Mesh(new THREE.RingGeometry(.05,.065,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff}));
+  reticle.matrixAutoUpdate=false;reticle.visible=false;scene.add(reticle);
+  const place=new THREE.Group();place.visible=false;scene.add(place);const L=createLia();place.add(L.lia);
+  const base=.15;applySize=()=>L.lia.scale.setScalar(base*sizeK);applySize();
+  renderer.xr.setReferenceSpaceType("local");await renderer.xr.setSession(session);
+  const viewer=await session.requestReferenceSpace("viewer");const hitSrc=await session.requestHitTestSource({space:viewer});
+  let placed=false;setStatus("searchPlane");setHint("aimDesk",false);
+  hud.querySelectorAll("button,nav").forEach(el=>el.addEventListener("beforexrselect",e=>e.preventDefault()));
+  session.addEventListener("select",()=>{if(!reticle.visible)return;place.position.setFromMatrixPosition(reticle.matrix);place.visible=true;placed=true;reticle.visible=false;
+    setHint(null);replaceB.hidden=false;setStatus("placed");cue.wave=2;talkWhenReady();});
+  replaceB.onclick=()=>{placed=false;place.visible=false;replaceB.hidden=true;setHint("aimDesk",false);setStatus("searchPlane");};
+  const ck=new THREE.Clock(),camW=new THREE.Vector3();
+  renderer.setAnimationLoop((ts,frame)=>{const dt=Math.min(ck.getDelta(),.05);
+    if(frame&&!placed){const hits=frame.getHitTestResults(hitSrc);
+      if(hits.length){const pose=hits[0].getPose(renderer.xr.getReferenceSpace());reticle.visible=true;reticle.matrix.fromArray(pose.transform.matrix);}else reticle.visible=false;}
+    renderer.xr.getCamera().getWorldPosition(camW);L.update(dt,ck.elapsedTime,place.visible?camW:null,place.visible);renderer.render(scene,camera);});
+  session.addEventListener("end",()=>{renderer.setAnimationLoop(null);renderer.dispose();if(mode==="xr"){stopMode=null;leave();}});
+  stopMode=()=>{try{session.end();}catch(e){}};
+}
+
+/* Lagesensor-Modus: Lia bleibt beim Drehen des Handys an ihrem Platz (iPhone & Android ohne ARCore) */
+async function needOrientationPermission(){ // muss direkt in der Antipp-Geste starten
+  try{if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function")return DeviceOrientationEvent.requestPermission();}catch(e){}
+  return Promise.resolve("granted");}
+let orientPerm=null;
+async function startGyro(){
+  enterHud("gyro");arEl.hidden=false;setStatus("start");setHint(null);
+  let cam;try{cam=await openCamera();}catch(e){camError(e);return;}
+  const perm=await (orientPerm||needOrientationPermission()).catch(()=>"denied");
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;renderer.domElement.className="gl";arEl.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();addLights(scene);const camera=new THREE.PerspectiveCamera(62,1,.01,30);
+  const rs=()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<innerHeight?62:42;camera.updateProjectionMatrix();};rs();addEventListener("resize",rs);
+  const DESK=-.42;                                 // angenommene Tischhöhe unter dem Handy (m)
+  const reticle=new THREE.Mesh(new THREE.RingGeometry(.035,.045,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));
+  reticle.visible=false;scene.add(reticle);
+  const place=new THREE.Group();place.visible=false;scene.add(place);const L=createLia();place.add(L.lia);
+  const base=.14;applySize=()=>L.lia.scale.setScalar(base*sizeK);applySize();
+  // Ausrichtung aus dem Lagesensor
+  const zee=new THREE.Vector3(0,0,1),eu=new THREE.Euler(),q0=new THREE.Quaternion(),q1=new THREE.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),target=new THREE.Quaternion();
+  let have=false;const D=Math.PI/180;
+  const onOri=e=>{if(e.alpha==null&&e.beta==null)return;const ori=((screen.orientation&&screen.orientation.angle)||window.orientation||0)*D;
+    eu.set((e.beta||0)*D,(e.alpha||0)*D,-(e.gamma||0)*D,"YXZ");target.setFromEuler(eu);target.multiply(q1);target.multiply(q0.setFromAxisAngle(zee,-ori));
+    if(!have){camera.quaternion.copy(target);have=true;}};
+  if(perm==="granted")addEventListener("deviceorientation",onOri);
+  setTimeout(()=>{if(!have){camera.quaternion.setFromEuler(new THREE.Euler(-.6,0,0));} },1200);   // ohne Sensor: fester Blick schräg nach unten
+  setStatus("searchPlane");setHint("aimDesk",false);
+  let placed=false;const dir=new THREE.Vector3();
+  const placeAtReticle=()=>{if(!reticle.visible)return;place.position.copy(reticle.position);
+    const c=camera.position.clone();place.rotation.y=Math.atan2(c.x-place.position.x,c.z-place.position.z);
+    place.visible=true;placed=true;reticle.visible=false;setHint(null);replaceB.hidden=false;setStatus("placed");cue.wave=2;talkWhenReady();};
+  const onTap=e=>{if(placed||e.target.closest("button,nav"))return;placeAtReticle();};
+  hud.addEventListener("click",onTap);arEl.addEventListener("click",onTap);
+  hud.style.pointerEvents="none";
+  replaceB.onclick=()=>{placed=false;place.visible=false;replaceB.hidden=true;setHint("aimDesk",false);setStatus("searchPlane");};
+  const ck=new THREE.Clock(),camW=new THREE.Vector3();
+  renderer.setAnimationLoop(()=>{const dt=Math.min(ck.getDelta(),.05);
+    if(have)camera.quaternion.slerp(target,Math.min(1,dt*18));
+    if(!placed){camera.getWorldDirection(dir);
+      const k=dir.y<-.12?DESK/dir.y:99;
+      if(k<=1.8){reticle.position.copy(dir).multiplyScalar(k);reticle.visible=true;}
+      else reticle.visible=false;}
+    camera.getWorldPosition(camW);L.update(dt,ck.elapsedTime,place.visible?camW:null,place.visible);renderer.render(scene,camera);});
+  stopMode=()=>{renderer.setAnimationLoop(null);removeEventListener("deviceorientation",onOri);removeEventListener("resize",rs);
+    hud.removeEventListener("click",onTap);arEl.removeEventListener("click",onTap);try{cam.s.getTracks().forEach(t=>t.stop());}catch(e){}renderer.dispose();};
+}
+
+/* --- Mit Karte (MindAR, iPhone & Android) --- */
+async function startCard(){
+  enterHud("card");arEl.hidden=false;setStatus("start");setHint("scanCard",true);
   try{
     const {MindARThree}=await import("mindar-image-three");
     const mindar=new MindARThree({container:arEl,imageTargetSrc:"lia-ziel.mind",uiScanning:"no",uiLoading:"no",uiError:"no",filterMinCF:.0005,filterBeta:20});
     const {renderer,scene,camera}=mindar;
-    renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.95;
-    addLights(scene);
+    renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;addLights(scene);
     const anchor=mindar.addAnchor(0);
-    const stage=new THREE.Group(); stage.rotation.x=Math.PI/2; anchor.group.add(stage);   // Karte liegt flach: Bild-Normale = oben
-    const L=createLia(); stage.add(L.lia);
-    const base=.3; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();
+    const stage=new THREE.Group();stage.rotation.x=Math.PI/2;anchor.group.add(stage);
+    const L=createLia();stage.add(L.lia);
+    const base=.3;applySize=()=>L.lia.scale.setScalar(base*sizeK);applySize();
     L.lia.position.set(0,0,.05);
-    onSoundReady=null;
-    anchor.onTargetFound=()=>{scanHint.hidden=true;statusEl.textContent="Lia steht auf der Karte";cue.wave=2.4;cue.brow=1;};
-    anchor.onTargetLost=()=>{statusEl.textContent="Karte nicht im Bild";};
-    await mindar.start();
-    statusEl.textContent="Suche Karte …";
-    const ck=new THREE.Clock(), camW=new THREE.Vector3();
+    anchor.onTargetFound=()=>{setHint(null);setStatus("onCard");cue.wave=2.4;cue.brow=1;talkWhenReady();};
+    anchor.onTargetLost=()=>{setStatus("lost");};
+    await mindar.start();setStatus("searchCard");
+    const ck=new THREE.Clock(),camW=new THREE.Vector3();
     renderer.setAnimationLoop(()=>{const dt=Math.min(ck.getDelta(),.05);camera.getWorldPosition(camW);
-      L.update(dt,ck.elapsedTime,camW,true);renderer.render(scene,camera);});
+      const seen=anchor.group.visible;L.update(dt,ck.elapsedTime,seen?camW:null,seen);renderer.render(scene,camera);});
     stopMode=()=>{renderer.setAnimationLoop(null);try{mindar.stop();}catch(e){}try{renderer.dispose();}catch(e){}};
-  }catch(err){
-    console.error(err); statusEl.textContent="Kamera nicht verfügbar";
-    scanText.textContent=location.protocol!=="https:"&&location.hostname!=="localhost"
-      ?"Die Kamera funktioniert nur über https. Bitte die Seite über eine https-Adresse öffnen."
-      :"Die Kamera konnte nicht gestartet werden. Bitte Kamerazugriff erlauben und die Seite neu laden.";
-  }
+  }catch(err){camError(err);}
 }
 
-/* --- Modus 2: WebXR ohne Karte (Android/ARCore) --- */
-const goXR=document.getElementById("goXR");
-if(navigator.xr&&navigator.xr.isSessionSupported){navigator.xr.isSessionSupported("immersive-ar").then(ok=>{goXR.hidden=!ok;}).catch(()=>{});}
-goXR.onclick=async()=>{
-  unlockAudio();
-  let session;
-  try{session=await navigator.xr.requestSession("immersive-ar",{requiredFeatures:["hit-test"],optionalFeatures:["dom-overlay"],domOverlay:{root:hud}});}
-  catch(e){alert("AR konnte nicht gestartet werden.");return;}
-  previewOn=false; enterHud("xr");
-  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-  renderer.setPixelRatio(devicePixelRatio); renderer.setSize(innerWidth,innerHeight);
-  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.95;
-  renderer.xr.enabled=true; arEl.hidden=false; arEl.style.background="transparent"; arEl.appendChild(renderer.domElement);
-  const scene=new THREE.Scene(); addLights(scene);
-  const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.01,30);
-  const reticle=new THREE.Mesh(new THREE.RingGeometry(.06,.08,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff}));
-  reticle.matrixAutoUpdate=false; reticle.visible=false; scene.add(reticle);
-  const place=new THREE.Group(); place.visible=false; scene.add(place);
-  const L=createLia(); place.add(L.lia);
-  const base=.17; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();   // ca. 30 cm groß
-  renderer.xr.setReferenceSpaceType("local"); await renderer.xr.setSession(session);
-  const viewer=await session.requestReferenceSpace("viewer"); const hitSrc=await session.requestHitTestSource({space:viewer});
-  let placed=false, started=false;
-  statusEl.textContent="Fläche suchen …"; scanHint.hidden=false; scanText.textContent="Bewege das Handy langsam über den Tisch und tippe, wenn der Kreis erscheint.";
-  hud.querySelectorAll("button,nav").forEach(el=>el.addEventListener("beforexrselect",e=>e.preventDefault()));
-  session.addEventListener("select",()=>{if(!reticle.visible)return;
-    place.position.setFromMatrixPosition(reticle.matrix); place.visible=true; placed=true; reticle.visible=false;
-    scanHint.hidden=true; replaceB.hidden=false; statusEl.textContent="Lia steht auf dem Tisch";
-    if(!started){started=true;start(0);} });
-  replaceB.onclick=()=>{placed=false;place.visible=false;replaceB.hidden=true;scanHint.hidden=false;statusEl.textContent="Fläche suchen …";};
-  const ck=new THREE.Clock(), camW=new THREE.Vector3();
-  renderer.setAnimationLoop((ts,frame)=>{const dt=Math.min(ck.getDelta(),.05);
-    if(frame&&!placed){const hits=frame.getHitTestResults(hitSrc);
-      if(hits.length){const pose=hits[0].getPose(renderer.xr.getReferenceSpace());reticle.visible=true;reticle.matrix.fromArray(pose.transform.matrix);} else reticle.visible=false;}
-    renderer.xr.getCamera().getWorldPosition(camW);
-    L.update(dt,ck.elapsedTime,camW,true); renderer.render(scene,camera);});
-  session.addEventListener("end",()=>{renderer.setAnimationLoop(null);renderer.dispose();if(mode==="xr"){stopMode=null;leave();}});
-  stopMode=()=>{try{session.end();}catch(e){}};
-};
-
-/* --- Modus 3: Anhören in der Vorschau --- */
-document.getElementById("goListen").onclick=()=>{
-  enterHud("listen"); scanHint.hidden=true; statusEl.textContent="Vorschau";
-  // Vorschau groß im Hintergrund
-  arEl.hidden=false; arEl.style.background="radial-gradient(110% 85% at 50% 18%,#f1ece6 0%,#d9d2ca 55%,#b7aea5 100%)";
-  const r=new THREE.WebGLRenderer({antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2));
-  r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=.95; arEl.appendChild(r.domElement);
-  const sc=new THREE.Scene(); addLights(sc); const cam=new THREE.PerspectiveCamera(26,1,.05,50);
-  const L=createLia(); sc.add(L.lia); previewOn=false;
-  const base=1; applySize=()=>L.lia.scale.setScalar(base*Math.min(sizeK,1.6)); applySize();
+/* --- Anhören ohne Kamera --- */
+function startListen(){
+  enterHud("listen");setHint(null);setStatus("preview");arEl.hidden=false;
+  arEl.style.background="radial-gradient(110% 85% at 50% 18%,#f1ece6 0%,#d9d2ca 55%,#b7aea5 100%)";
+  const r=new THREE.WebGLRenderer({antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));
+  r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.95;arEl.appendChild(r.domElement);
+  const sc=new THREE.Scene();addLights(sc);const cam=new THREE.PerspectiveCamera(26,1,.05,50);
+  const L=createLia();sc.add(L.lia);
+  applySize=()=>L.lia.scale.setScalar(Math.min(sizeK,1.6));applySize();
   const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.position.set(0,1.1,Math.max(5.2,5.2/Math.min(1,cam.aspect*1.4)));cam.lookAt(0,1,0);cam.updateProjectionMatrix();};
-  rs(); addEventListener("resize",rs);
+  rs();addEventListener("resize",rs);
   const ck=new THREE.Clock();
   r.setAnimationLoop(()=>{const dt=Math.min(ck.getDelta(),.05);L.update(dt,ck.elapsedTime,cam.position,false);r.render(sc,cam);});
   stopMode=()=>{r.setAnimationLoop(null);r.dispose();removeEventListener("resize",rs);arEl.style.background="";};
   start(0);
-};
+}
+
+/* --- Einstiege (jede Taste ist zugleich die Freigabe für Ton und Sensoren) --- */
+function gesture(){unlockAudio();orientPerm=needOrientationPermission();}
+document.getElementById("goFree").onclick=()=>{gesture();startFree();};
+document.getElementById("goCard").onclick=()=>{gesture();startCard();};
+document.getElementById("goListen").onclick=()=>{unlockAudio();startListen();};
+gate.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{LANG=b.dataset.go;setTrack();applyLang();gesture();startFree();});
+document.getElementById("gateCard").onclick=()=>{gesture();startCard();};
 
 /* --- Druckkarte --- */
 const printEl=document.getElementById("print");
@@ -584,12 +719,13 @@ document.getElementById("goPrint").onclick=()=>{
   const u0=new URL(location.href);u0.hash="";u0.search="?ar=1";const url=u0.toString();
   try{const q=qrcode(0,"M");q.addData(url);q.make();document.getElementById("qr").innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});}
   catch(e){document.getElementById("qr").textContent=url;}
-  printEl.hidden=false; startEl.hidden=true; previewOn=false;};
+  printEl.hidden=false;startEl.hidden=true;previewOn=false;};
 document.getElementById("pBack").onclick=()=>{printEl.hidden=true;startEl.hidden=false;previewOn=true;pResize();};
 document.getElementById("pPrint").onclick=()=>window.print();
 
-if(new URLSearchParams(location.search).has("ar"))startCard(true);
-if(location.protocol==="file:")document.getElementById("envNote").textContent="Hinweis: Als lokale Datei geöffnet. Kamera und Karten-Tracking funktionieren erst, wenn der Ordner über https im Netz liegt.";
+applyLang();
+if(new URLSearchParams(location.search).has("ar")){startEl.hidden=true;gate.hidden=false;previewOn=false;}
+if(location.protocol==="file:")document.getElementById("envNote").textContent="Hinweis: Als lokale Datei geöffnet. Kamera und AR funktionieren erst, wenn der Ordner über https im Netz liegt.";
 </script>
 </body>
 </html>
