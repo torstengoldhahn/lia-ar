@@ -52,7 +52,7 @@ h1 em{font-style:normal;color:var(--accent)}
 .status{pointer-events:none}
 #scanHint{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;width:min(84%,340px);
   background:var(--hud);border-radius:16px;padding:16px 18px;font-size:15px}
-#tapSound{position:absolute;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);pointer-events:auto;
+#tapSound{position:absolute;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);pointer-events:auto;
   background:var(--accent);color:#fff;border:0;border-radius:999px;padding:12px 20px;font:800 16px var(--display);box-shadow:0 6px 20px rgba(0,0,0,.3);
   animation:pulse 1.6s ease-in-out infinite;white-space:nowrap}
 @keyframes pulse{50%{transform:translateX(-50%) scale(1.06)}}
@@ -354,8 +354,9 @@ function createLia(){
     const m=reduce?.35:1, talk=sp.on?1:0;
     // Zum Betrachter drehen (nur in AR)
     if(follow&&camWorld&&lia.parent){tmp.copy(camWorld);lia.parent.worldToLocal(tmp);
-      const dx=tmp.x-lia.position.x, dz=tmp.z-lia.position.z;
-      if(Math.hypot(dx,dz)>1e-3){let d=Math.atan2(dx,dz)-lia.rotation.y; d=Math.atan2(Math.sin(d),Math.cos(d)); lia.rotation.y+=d*Math.min(1,dt*1.5);}}
+      const dx=tmp.x-lia.position.x, dz=tmp.z-lia.position.z, dy=tmp.y-lia.position.y, hz=Math.hypot(dx,dz);
+      const w=clamp(hz/Math.max(1e-6,Math.hypot(hz,dy))*2.2-.3,0,1);           // senkrecht von oben: nicht drehen
+      if(hz>1e-6&&w>0){let d=Math.atan2(dx,dz)-lia.rotation.y; d=Math.atan2(Math.sin(d),Math.cos(d)); lia.rotation.y+=d*Math.min(1,dt*1.2)*w;}}
     const br=Math.sin(t*1.35);
     torso.scale.set(1+br*.004,1+br*.006,1+br*.008);
     hips.rotation.z=nz(t*.25,1,1.7,2.9)*.018*m; hips.position.x=nz(t*.25,1.1,1.9,.7)*.012*m;
@@ -364,11 +365,11 @@ function createLia(){
     // Blickrichtung zur Kamera
     let yawT=0,pitT=.12;
     if(camWorld){tmp.copy(camWorld);neckGrp.worldToLocal(tmp);
-      yawT=Math.atan2(tmp.x,tmp.z); pitT=-Math.atan2(tmp.y-.19,Math.hypot(tmp.x,tmp.z));
-      if(tmp.z<0){yawT=clamp(yawT,-1.2,1.2);} }
+      const hz=Math.hypot(tmp.x,tmp.z), dy=tmp.y-.19, w=clamp(hz/Math.max(1e-6,Math.hypot(hz,dy))*2.2-.3,0,1);
+      yawT=tmp.z>0?Math.atan2(tmp.x,tmp.z)*w:0; pitT=-Math.atan2(dy,hz); }
     cue.nod*=Math.pow(.02,dt);
-    const hy=clamp(yawT*.55,-.6,.6), hp=clamp(pitT*.5,-.35,.35);
-    head.rotation.y=lerp(head.rotation.y,hy+nz(t*.4,1,1.8,2.7)*.1*m+talk*nz(t,1.3,2.1,3.3)*.06,Math.min(1,dt*3));
+    const hy=clamp(yawT*.5,-.5,.5), hp=clamp(pitT*.45,-.3,.25);
+    head.rotation.y=lerp(head.rotation.y,hy+nz(t*.4,1,1.8,2.7)*.1*m+talk*nz(t,1.3,2.1,3.3)*.06,Math.min(1,dt*2));
     head.rotation.x=lerp(head.rotation.x,hp+nz(t*.35,1.3,2.2,.8)*.04*m+talk*nz(t,1.9,3.1,4.3)*.04+cue.nod*.12,Math.min(1,dt*3));
     head.rotation.z=nz(t*.3,1.1,.6,2.4)*.05*m+talk*nz(t,1.1,2.3,1.7)*.04;
     if((sacT-=dt)<0){sacT=.8+Math.random()*2.2;sac=Math.random()<.6?[0,0]:[(Math.random()-.5)*.14,(Math.random()-.5)*.08];}
@@ -447,7 +448,9 @@ function speakFrom(from){const my=++token;
       u.onstart=()=>{if(my===token)beginSentence(i);};
       u.onboundary=e=>{if(my===token&&e.name==="word"){sp.syncChar=e.charIndex;sp.syncT=performance.now();}};
       u.onend=()=>{if(my!==token)return;endSentence();if(i===endIdx-1)finish();};
-      u.onerror=e=>{if(my!==token||e.error==="interrupted"||e.error==="canceled")return;setMuted(true);speakFrom(cur);};
+      u.onerror=e=>{if(my!==token||e.error==="interrupted"||e.error==="canceled")return;
+        if(e.error==="not-allowed"){halt();playing=false;askTap();return;}
+        setMuted(true);speakFrom(cur);};
       utts.push(u); synth.speak(u);}
     if(voice&&!voice.localService)keep=setInterval(()=>{if(synth.speaking&&!paused){synth.pause();synth.resume();}},10000);
   } else {
@@ -456,7 +459,7 @@ function speakFrom(from){const my=++token;
       timer=setTimeout(()=>{if(my!==token)return;endSentence();timer=setTimeout(()=>stepTo(i+1),ITEMS[i+1]&&ITEMS[i+1].c!==ITEMS[i].c?650:280);},ms);};
     stepTo(from);}
 }
-function halt(){token++;clearTimeout(timer);clearInterval(keep);if(synth)synth.cancel();sp.on=false;}
+function halt(){token++;clearTimeout(timer);clearInterval(keep);if(synth&&(synth.speaking||synth.pending))synth.cancel();sp.on=false;}
 function finish(){halt();playing=false;playB.textContent="Nochmal";card.dataset.off="1";sub.textContent="Das war's! Tippe ein Thema an, um es noch einmal zu hören.";}
 function setMuted(v){muted=v;muteB.setAttribute("aria-pressed",v);}
 if(muted)setMuted(true);
@@ -480,29 +483,30 @@ document.getElementById("smaller").onclick=()=>{sizeK=Math.max(.25,sizeK/1.25);a
 /* --- Modus 1: Karten-Tracking (iPhone & Android) --- */
 const tapSound=document.getElementById("tapSound");
 let needTap=false, onSoundReady=null;
-function soundTap(){if(!needTap)return;needTap=false;tapSound.hidden=true;unlockSpeech();if(onSoundReady)onSoundReady();}
-tapSound.onclick=soundTap;
+function soundTap(e){if(!needTap)return;if(e&&e.target&&e.target.closest&&e.target.closest("#exit"))return;
+  if(e&&e.type==="click"&&e.target!==tapSound){e.stopPropagation();e.preventDefault();}
+  needTap=false;tapSound.hidden=true;document.removeEventListener("click",soundTap,true);
+  setMuted(!synth);start(0);if(onSoundReady)onSoundReady();}
+function askTap(){needTap=true;tapSound.hidden=false;document.addEventListener("click",soundTap,true);}
+
 document.getElementById("goCard").onclick=()=>startCard(false);
 async function startCard(auto){
-  if(!auto)unlockSpeech(); else {needTap=true;tapSound.hidden=false;document.addEventListener("pointerdown",soundTap,{once:true,capture:true});}
+  if(!auto){setMuted(!synth);start(0);} else askTap();
   previewOn=false; enterHud("card"); arEl.hidden=false;
   statusEl.textContent="Kamera startet …"; scanHint.hidden=false; scanText.textContent="Richte die Kamera auf das Lia-Bild der Karte.";
   try{
     const {MindARThree}=await import("mindar-image-three");
-    const mindar=new MindARThree({container:arEl,imageTargetSrc:"lia-ziel.mind",uiScanning:"no",uiLoading:"no",uiError:"no",filterMinCF:.0001,filterBeta:.01});
+    const mindar=new MindARThree({container:arEl,imageTargetSrc:"lia-ziel.mind",uiScanning:"no",uiLoading:"no",uiError:"no",filterMinCF:.0005,filterBeta:20});
     const {renderer,scene,camera}=mindar;
     renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.95;
     addLights(scene);
     const anchor=mindar.addAnchor(0);
     const stage=new THREE.Group(); stage.rotation.x=Math.PI/2; anchor.group.add(stage);   // Karte liegt flach: Bild-Normale = oben
     const L=createLia(); stage.add(L.lia);
-    const base=.45; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();
-    L.lia.position.set(.05,0,.06);
-    let started=false, found=false;
-    const go=()=>{if(!started&&found&&!needTap){started=true;start(0);}};
-    onSoundReady=go;
-    anchor.onTargetFound=()=>{found=true;scanHint.hidden=true;statusEl.textContent="Lia steht auf der Karte";
-      if(needTap){cue.wave=2.4;cue.brow=1;} go(); };
+    const base=.3; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();
+    L.lia.position.set(0,0,.05);
+    onSoundReady=null;
+    anchor.onTargetFound=()=>{scanHint.hidden=true;statusEl.textContent="Lia steht auf der Karte";cue.wave=2.4;cue.brow=1;};
     anchor.onTargetLost=()=>{statusEl.textContent="Karte nicht im Bild";};
     await mindar.start();
     statusEl.textContent="Suche Karte …";
@@ -560,7 +564,7 @@ goXR.onclick=async()=>{
 
 /* --- Modus 3: Anhören in der Vorschau --- */
 document.getElementById("goListen").onclick=()=>{
-  unlockSpeech(); enterHud("listen"); scanHint.hidden=true; statusEl.textContent="Vorschau";
+  enterHud("listen"); scanHint.hidden=true; statusEl.textContent="Vorschau";
   // Vorschau groß im Hintergrund
   arEl.hidden=false; arEl.style.background="radial-gradient(110% 85% at 50% 18%,#f1ece6 0%,#d9d2ca 55%,#b7aea5 100%)";
   const r=new THREE.WebGLRenderer({antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2));
