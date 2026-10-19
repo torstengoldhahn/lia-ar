@@ -52,6 +52,11 @@ h1 em{font-style:normal;color:var(--accent)}
 .status{pointer-events:none}
 #scanHint{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;width:min(84%,340px);
   background:var(--hud);border-radius:16px;padding:16px 18px;font-size:15px}
+#tapSound{position:absolute;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);pointer-events:auto;
+  background:var(--accent);color:#fff;border:0;border-radius:999px;padding:12px 20px;font:800 16px var(--display);box-shadow:0 6px 20px rgba(0,0,0,.3);
+  animation:pulse 1.6s ease-in-out infinite;white-space:nowrap}
+@keyframes pulse{50%{transform:translateX(-50%) scale(1.06)}}
+@media (prefers-reduced-motion:reduce){#tapSound{animation:none}}
 #scanHint .frame{width:120px;height:84px;margin:0 auto 10px;border:3px dashed rgba(255,255,255,.85);border-radius:10px}
 #hud .bottom{position:absolute;left:0;right:0;bottom:0;padding:0 max(12px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
   display:grid;gap:8px}
@@ -134,12 +139,13 @@ h1 em{font-style:normal;color:var(--accent)}
       <button class="pill" id="bigger" aria-label="Lia größer">+</button>
     </div>
   </div>
+  <button id="tapSound" hidden>🔊 Antippen, damit Lia spricht</button>
   <div id="scanHint"><div class="frame"></div><span id="scanText">Richte die Kamera auf das Lia-Bild der Karte.</span></div>
   <div id="card" data-off="1"></div>
   <div class="bottom">
     <p id="sub" hidden></p>
     <div class="ctl">
-      <button class="pill main" id="play">Pause</button>
+      <button class="pill main" id="play">Abspielen</button>
       <button class="pill" id="replace" hidden>Neu platzieren</button>
       <button class="pill" id="mute" aria-pressed="false">Nur Untertitel</button>
     </div>
@@ -464,7 +470,7 @@ const replaceB=document.getElementById("replace");
 let mode=null, stopMode=null, sizeK=1, applySize=()=>{}, wake=null;
 async function keepAwake(){try{wake=await navigator.wakeLock?.request("screen");}catch(e){}}
 function enterHud(m){mode=m;startEl.hidden=true;hud.hidden=false;sub.hidden=true;card.dataset.off="1";keepAwake();}
-function leave(){halt();playing=false;sp.on=false;if(stopMode)stopMode();stopMode=null;mode=null;
+function leave(){halt();playing=false;sp.on=false;needTap=false;tapSound.hidden=true;if(stopMode)stopMode();stopMode=null;mode=null;
   arEl.hidden=true;arEl.innerHTML="";hud.hidden=true;startEl.hidden=false;scanHint.hidden=false;replaceB.hidden=true;
   try{wake&&wake.release();}catch(e){} previewOn=true; pResize();}
 document.getElementById("exit").onclick=leave;
@@ -472,8 +478,14 @@ document.getElementById("bigger").onclick=()=>{sizeK=Math.min(4,sizeK*1.25);appl
 document.getElementById("smaller").onclick=()=>{sizeK=Math.max(.25,sizeK/1.25);applySize();};
 
 /* --- Modus 1: Karten-Tracking (iPhone & Android) --- */
-document.getElementById("goCard").onclick=async()=>{
-  unlockSpeech(); previewOn=false; enterHud("card"); arEl.hidden=false;
+const tapSound=document.getElementById("tapSound");
+let needTap=false, onSoundReady=null;
+function soundTap(){if(!needTap)return;needTap=false;tapSound.hidden=true;unlockSpeech();if(onSoundReady)onSoundReady();}
+tapSound.onclick=soundTap;
+document.getElementById("goCard").onclick=()=>startCard(false);
+async function startCard(auto){
+  if(!auto)unlockSpeech(); else {needTap=true;tapSound.hidden=false;document.addEventListener("pointerdown",soundTap,{once:true,capture:true});}
+  previewOn=false; enterHud("card"); arEl.hidden=false;
   statusEl.textContent="Kamera startet …"; scanHint.hidden=false; scanText.textContent="Richte die Kamera auf das Lia-Bild der Karte.";
   try{
     const {MindARThree}=await import("mindar-image-three");
@@ -486,9 +498,11 @@ document.getElementById("goCard").onclick=async()=>{
     const L=createLia(); stage.add(L.lia);
     const base=.45; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();
     L.lia.position.set(.05,0,.06);
-    let started=false;
-    anchor.onTargetFound=()=>{scanHint.hidden=true;statusEl.textContent="Lia steht auf der Karte";
-      if(!started){started=true;start(0);} };
+    let started=false, found=false;
+    const go=()=>{if(!started&&found&&!needTap){started=true;start(0);}};
+    onSoundReady=go;
+    anchor.onTargetFound=()=>{found=true;scanHint.hidden=true;statusEl.textContent="Lia steht auf der Karte";
+      if(needTap){cue.wave=2.4;cue.brow=1;} go(); };
     anchor.onTargetLost=()=>{statusEl.textContent="Karte nicht im Bild";};
     await mindar.start();
     statusEl.textContent="Suche Karte …";
@@ -502,7 +516,7 @@ document.getElementById("goCard").onclick=async()=>{
       ?"Die Kamera funktioniert nur über https. Bitte die Seite über eine https-Adresse öffnen."
       :"Die Kamera konnte nicht gestartet werden. Bitte Kamerazugriff erlauben und die Seite neu laden.";
   }
-};
+}
 
 /* --- Modus 2: WebXR ohne Karte (Android/ARCore) --- */
 const goXR=document.getElementById("goXR");
@@ -565,13 +579,14 @@ document.getElementById("goListen").onclick=()=>{
 /* --- Druckkarte --- */
 const printEl=document.getElementById("print");
 document.getElementById("goPrint").onclick=()=>{
-  const url=location.href.split("#")[0];
+  const u0=new URL(location.href);u0.hash="";u0.search="?ar=1";const url=u0.toString();
   try{const q=qrcode(0,"M");q.addData(url);q.make();document.getElementById("qr").innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});}
   catch(e){document.getElementById("qr").textContent=url;}
   printEl.hidden=false; startEl.hidden=true; previewOn=false;};
 document.getElementById("pBack").onclick=()=>{printEl.hidden=true;startEl.hidden=false;previewOn=true;pResize();};
 document.getElementById("pPrint").onclick=()=>window.print();
 
+if(new URLSearchParams(location.search).has("ar"))startCard(true);
 if(location.protocol==="file:")document.getElementById("envNote").textContent="Hinweis: Als lokale Datei geöffnet. Kamera und Karten-Tracking funktionieren erst, wenn der Ordner über https im Netz liegt.";
 </script>
 </body>
