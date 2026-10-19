@@ -2,6 +2,7 @@ LIA – AR-Avatar zur generalistischen Pflegeausbildung
 =====================================================
 
 Inhalt des Ordners
+  audio/          Lias Stimme, ein Satz pro Datei
   index.html      Die AR-Seite (Startseite, Karten-AR, Tisch-AR, Druckkarte)
   lia-ziel.mind   Tracking-Daten für das Kartenmotiv (nicht verändern)
   lia-ziel.jpg    Das Kartenmotiv, auf dem Lia steht
@@ -29,11 +30,10 @@ Inhalt des Ordners
    "Ohne Karte auf den Tisch stellen": Fläche suchen, antippen, fertig.
 
 Hinweise
-  - Die Stimme kommt aus der Sprachausgabe des Handys. iPhones klingen gut,
-    noch besser nach Laden einer "Premium"-Stimme (Einstellungen →
-    Bedienungshilfen → Gesprochene Inhalte → Stimmen → Deutsch).
-  - Lautschalter am iPhone: Ist das Handy stumm geschaltet, bleibt Lia
-    teilweise stumm. Dann Untertitel nutzen oder Ton einschalten.
+  - Lias Stimme besteht aus fertigen Tondateien im Ordner audio/
+    (s01.mp3 bis s30.mp3, ein Satz pro Datei). Wer Texte ändert, braucht
+    neue Tondateien – oder spricht sie selbst ein (gleiche Dateinamen).
+  - Nach dem Scannen einmal antippen: Erst dann dürfen Handys Ton abspielen.
   - Die Seite lädt three.js und MindAR von cdn.jsdelivr.net; das Gerät
     braucht dafür Internet.
   - Kapitel "Bei der AWO" und Texte stehen im oberen Teil von index.html
