@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lia · AR Pflegeausbildung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#f3eee8; --surface:#ffffff; --ink:#1c2230; --muted:#5b6170; --line:#e2ddd6;
+  --accent:#d6111c; --accent-ink:#fff; --teal:#2b7d86; --chip:#f6eceb;
+  --hud:rgba(18,22,30,.78); --hud-ink:#fff;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Startseite */
+#start{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;overflow:auto;
+  padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.head{display:flex;align-items:center;gap:10px}
+.head i{width:26px;height:26px;border-radius:50%;background:var(--accent)}
+.head b{font:800 18px var(--display)}
+.head span{color:var(--muted);font-size:13px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center;max-width:980px;width:100%;margin:0 auto}
+#prev{width:100%;aspect-ratio:3/4;max-height:62vh;display:block;
+  background:radial-gradient(110% 85% at 50% 18%,#f1ece6 0%,#d9d2ca 55%,#b7aea5 100%);border-radius:22px}
+h1{font:800 clamp(30px,5vw,48px)/1.05 var(--display);margin:0 0 12px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lead{color:var(--muted);max-width:44ch;margin:0 0 20px}
+.actions{display:grid;gap:10px;max-width:380px}
+.btn{border:0;border-radius:14px;padding:14px 18px;text-align:left;display:grid;gap:2px;background:var(--surface);color:var(--ink);box-shadow:0 1px 0 var(--line),0 2px 10px rgba(0,0,0,.05)}
+.btn strong{font:800 16px var(--display)}
+.btn small{color:var(--muted);font-size:13px}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary small{color:rgba(255,255,255,.85)}
+.note{font-size:12.5px;color:var(--muted);max-width:980px;margin:12px auto 0;width:100%}
+@media (max-width:720px){.hero{grid-template-columns:1fr}#prev{max-height:38vh;aspect-ratio:auto;height:38vh}}
+
+/* AR */
+#ar{position:fixed;inset:0;background:#000}
+#ar video{object-fit:cover}
+#hud{position:fixed;inset:0;pointer-events:none;color:var(--hud-ink);z-index:20}
+#hud .top{position:absolute;top:calc(10px + env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));
+  display:flex;gap:8px;align-items:center;justify-content:space-between}
+.pill{pointer-events:auto;background:var(--hud);color:var(--hud-ink);border:0;border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px;backdrop-filter:blur(6px)}
+.status{pointer-events:none}
+#scanHint{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;width:min(84%,340px);
+  background:var(--hud);border-radius:16px;padding:16px 18px;font-size:15px}
+#scanHint .frame{width:120px;height:84px;margin:0 auto 10px;border:3px dashed rgba(255,255,255,.85);border-radius:10px}
+#hud .bottom{position:absolute;left:0;right:0;bottom:0;padding:0 max(12px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  display:grid;gap:8px}
+#sub{margin:0 auto;max-width:640px;background:var(--hud);border-radius:14px;padding:10px 14px;font-size:17px;line-height:1.42;text-wrap:balance;text-align:center}
+.ctl{display:flex;gap:8px;align-items:center;pointer-events:auto;flex-wrap:wrap;justify-content:center}
+.ctl .pill.main{background:var(--accent);color:#fff}
+#chips{display:flex;gap:6px;overflow-x:auto;pointer-events:auto;padding-bottom:2px;scrollbar-width:none}
+#chips button{flex:none;border:1px solid transparent;background:var(--hud);color:#fff;border-radius:999px;padding:6px 11px;font-size:13px;white-space:nowrap}
+#chips button[aria-current="true"]{border-color:#fff}
+#card{position:absolute;right:max(12px,env(safe-area-inset-right));top:calc(58px + env(safe-area-inset-top));width:min(260px,calc(100% - 24px));
+  background:var(--surface);color:var(--ink);border-radius:14px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);font-size:12.5px;transition:opacity .3s}
+#card[data-off="1"]{opacity:0}
+#card h3{margin:0 0 6px;font:800 14px var(--display)}
+.bars{display:grid;gap:4px}
+.bar{display:grid;grid-template-columns:1fr 38px;gap:6px;align-items:center}
+.bar span{display:block;height:6px;border-radius:3px;background:var(--teal)}
+.bar.v span{background:var(--accent)}
+.bar b{text-align:right;font-variant-numeric:tabular-nums}
+.big{display:flex;gap:12px}.big div{flex:1;min-width:0}
+.big strong{display:block;font:800 24px var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
+.foot{color:var(--muted);font-size:11px;margin:6px 0 0}
+
+/* Druckkarte */
+#print{position:fixed;inset:0;background:#e9e5df;overflow:auto;z-index:40;padding:24px max(16px,env(safe-area-inset-right)) 24px max(16px,env(safe-area-inset-left))}
+.sheet{width:210mm;max-width:100%;margin:0 auto;background:#fff;color:#1c2230;padding:10mm;display:grid;grid-template-columns:140mm 1fr;gap:8mm;align-items:center;
+  border:1px dashed #b8b2aa;aspect-ratio:210/148}
+.sheet img{width:140mm;max-width:100%;display:block}
+.sheet .qr svg{width:100%;height:auto;display:block}
+.sheet ol{padding-left:18px;margin:6mm 0 0;font-size:11pt;line-height:1.35}
+.sheet h2{font:800 15pt var(--display);margin:0 0 3mm}
+.ptools{display:flex;gap:10px;justify-content:center;margin:16px 0;flex-wrap:wrap}
+.ptools button{border:0;border-radius:12px;padding:10px 16px;font-weight:700}
+.ptools .go{background:var(--accent);color:#fff}
+@media (max-width:820px){.sheet{grid-template-columns:1fr;aspect-ratio:auto}}
+@media print{
+  @page{size:A5 landscape;margin:0}
+  body{background:#fff;overflow:visible}
+  #start,#ar,#hud,.ptools{display:none!important}
+  #print{position:static;padding:0;background:#fff}
+  .sheet{border:0;width:210mm;height:148mm;grid-template-columns:140mm 1fr}
+}
+[hidden]{display:none!important}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "mindar-image-three":"https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+}}
+</script>
+</head>
+<body>
+
+<section id="start">
+  <div class="head"><i></i><b>Lia</b><span>AWO Bamberg Stadt und Land · Pflegeausbildung</span></div>
+  <div class="hero">
+    <canvas id="prev" aria-label="Vorschau: Lia, eine Pflegefachperson in Kasack mit Stethoskop"></canvas>
+    <div>
+      <h1>Lia steht gleich <em>auf deinem Tisch.</em></h1>
+      <p class="lead">Lia ist Pflegefachperson und erklärt dir in rund vier Minuten die generalistische Pflegeausbildung. Richte die Kamera auf die Lia-Karte, dann steht sie darauf und erzählt.</p>
+      <div class="actions">
+        <button class="btn primary" id="goCard"><strong>Mit Karte starten</strong><small>Kamera auf das Lia-Bild der Karte richten</small></button>
+        <button class="btn" id="goXR" hidden><strong>Ohne Karte auf den Tisch stellen</strong><small>Fläche suchen und antippen (Android mit ARCore)</small></button>
+        <button class="btn" id="goListen"><strong>Ohne Kamera anhören</strong><small>Lia erzählt hier in der Vorschau</small></button>
+        <button class="btn" id="goPrint"><strong>Karte drucken</strong><small>A5 quer, mit QR-Code zu dieser Seite</small></button>
+      </div>
+    </div>
+  </div>
+  <p class="note" id="envNote">Kamera und AR brauchen eine Verbindung über https. Lia nutzt die Sprachausgabe deines Geräts; am natürlichsten klingt sie in Microsoft Edge und auf iPhone/iPad.</p>
+</section>
+
+<div id="ar" hidden></div>
+
+<div id="hud" hidden>
+  <div class="top">
+    <button class="pill" id="exit" aria-label="AR beenden">✕ Beenden</button>
+    <div class="pill status" id="status">Kamera startet …</div>
+    <div style="display:flex;gap:6px">
+      <button class="pill" id="smaller" aria-label="Lia kleiner">–</button>
+      <button class="pill" id="bigger" aria-label="Lia größer">+</button>
+    </div>
+  </div>
+  <div id="scanHint"><div class="frame"></div><span id="scanText">Richte die Kamera auf das Lia-Bild der Karte.</span></div>
+  <div id="card" data-off="1"></div>
+  <div class="bottom">
+    <p id="sub" hidden></p>
+    <div class="ctl">
+      <button class="pill main" id="play">Pause</button>
+      <button class="pill" id="replace" hidden>Neu platzieren</button>
+      <button class="pill" id="mute" aria-pressed="false">Nur Untertitel</button>
+    </div>
+    <nav id="chips" aria-label="Themen"></nav>
+  </div>
+</div>
+
+<section id="print" hidden>
+  <div class="ptools"><button id="pBack">Zurück</button><button class="go" id="pPrint">Drucken</button></div>
+  <div class="sheet">
+    <img src="lia-ziel.jpg" alt="Lia-Bildmotiv für die Kamera">
+    <div>
+      <h2>Lia erklärt dir die Pflegeausbildung</h2>
+      <div class="qr" id="qr"></div>
+      <ol>
+        <li>QR-Code scannen</li>
+        <li>„Mit Karte starten“ tippen und Kamera erlauben</li>
+        <li>Handy über das Bild links halten: Lia steht darauf und erzählt</li>
+      </ol>
+    </div>
+  </div>
+  <p class="note" style="text-align:center">Farbig auf mattes Papier drucken und flach hinlegen. Das Bild links muss ganz im Kamerabild sein.</p>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script type="module">
+import * as THREE from "three";
+
+/* =================== Inhalte =================== */
+const CH = [
+ {t:"Hallo!", wave:true, s:[
+  "Hallo, ich bin Lia, schön, dass du da bist!",
+  "Ich erzähle dir, wie die generalistische Pflegeausbildung funktioniert.",
+  "Tipp unten einfach auf ein Thema, oder hör dir alles am Stück an."]},
+ {t:"Was ist Generalistik?", s:[
+  "Seit 2020 gibt es in Deutschland eine gemeinsame Pflegeausbildung.",
+  "Sie verbindet die frühere Altenpflege, die Krankenpflege und die Kinderkrankenpflege zu einem einzigen Beruf.",
+  "Der Abschluss heißt Pflegefachfrau, Pflegefachmann oder Pflegefachperson.",
+  "Du lernst, Menschen jeden Alters zu pflegen, im Krankenhaus, im Pflegeheim und bei ihnen zu Hause."]},
+ {t:"Dauer & Aufbau", card:"aufbau", s:[
+  "In Vollzeit dauert die Ausbildung drei Jahre, in Teilzeit höchstens fünf.",
+  "Du lernst an zwei Orten: mindestens 2100 Stunden an der Pflegeschule, und mindestens 2500 Stunden in der Praxis.",
+  "Theorie und Praxis wechseln sich in Blöcken ab.",
+  "Bei deinen Einsätzen begleiten dich erfahrene Praxisanleitende."]},
+ {t:"Die Einsätze", card:"einsaetze", s:[
+  "Deine Praxis beginnt bei deinem Ausbildungsträger, mit dem Orientierungseinsatz.",
+  "Danach kommen Pflichteinsätze im Krankenhaus, in der stationären Langzeitpflege und in der ambulanten Pflege.",
+  "Dazu kommen kürzere Einsätze in der Kinderkrankenpflege und in der Psychiatrie.",
+  "Zum Schluss machst du den Vertiefungseinsatz mit 500 Stunden, wieder bei deinem Träger. Dort wirst du richtig sicher."]},
+ {t:"Wahlrecht", card:"wahl", s:[
+  "Liegt dein Vertiefungseinsatz in der Langzeitpflege oder in der Kinderkrankenpflege, hast du vor dem letzten Ausbildungsdrittel eine Wahl.",
+  "Du bleibst generalistisch, oder du schließt speziell in der Altenpflege oder in der Kinderkrankenpflege ab.",
+  "Mein Tipp: Fast alle bleiben generalistisch. Nur dieser Abschluss wird in der ganzen EU automatisch anerkannt.",
+  "Ob es die speziellen Abschlüsse auf Dauer weiter gibt, prüft gerade der Gesetzgeber."]},
+ {t:"Voraussetzungen", s:[
+  "Du brauchst einen mittleren Schulabschluss, oder eine andere abgeschlossene zehnjährige Schulbildung.",
+  "Mit dem Mittelschulabschluss klappt es auch, wenn du dazu eine zweijährige Berufsausbildung oder eine Ausbildung in der Pflegehilfe hast.",
+  "Außerdem brauchst du die gesundheitliche Eignung, ein Führungszeugnis und gute Deutschkenntnisse, meistens auf dem Niveau B2."]},
+ {t:"Abschluss & Zukunft", s:[
+  "Am Ende steht eine staatliche Prüfung, schriftlich, mündlich und praktisch.",
+  "Danach übernimmst du Aufgaben, die nur Pflegefachpersonen machen dürfen.",
+  "Du stellst den Pflegebedarf fest, steuerst den Pflegeprozess und sicherst die Qualität der Pflege.",
+  "Schulgeld zahlst du nicht. Im Gegenteil, du bekommst eine Ausbildungsvergütung.",
+  "Später stehen dir Weiterbildungen, Leitungsaufgaben oder ein Pflegestudium offen."]},
+ {t:"Bei der AWO", wave:true, s:[
+  "Bei der AWO Bamberg Stadt und Land lernst du bei einem Träger mit klaren Werten: Solidarität, Toleranz, Freiheit, Gleichheit und Gerechtigkeit.",
+  "Deine Vergütung richtet sich nach unserem Tarifvertrag.",
+  "Neugierig geworden? Dann melde dich bei unserer Personalabteilung. Wir freuen uns auf dich!"]}
+];
+const CARDS = {
+ aufbau:`<h3>Zwei Lernorte, 3 Jahre</h3><div class="big"><div><strong>2.100</strong>Std. Pflegeschule</div><div><strong>2.500</strong>Std. Praxis</div></div><p class="foot">Mindeststunden · Teilzeit bis 5 Jahre</p>`,
+ einsaetze:(()=>{const d=[["Orientierung (Träger)",400],["Akutpflege stationär",400],["Langzeitpflege stationär",400],["Ambulante Pflege",400],["Pädiatrie",120],["Psychiatrie",120],["Vertiefung (Träger)",500,1],["Weitere Einsätze",80],["Freie Verteilung",80]];
+  return `<h3>Praxis: 2.500 Stunden</h3><div class="bars">${d.map(([n,h,v])=>`<div class="bar${v?" v":""}"><div>${n}<span style="width:${h/5}%"></span></div><b>${h}</b></div>`).join("")}</div>`})(),
+ wahl:`<h3>Wahlrecht genutzt (2024)</h3><div class="big"><div><strong>83</strong>Altenpflege</div><div><strong>324</strong>Kinderkranken&shy;pflege</div></div><p class="foot">Quelle: Bericht an den Bundestag, Drs. 21/4030</p>`
+};
+const ITEMS=[]; CH.forEach((c,ci)=>c.s.forEach(s=>ITEMS.push({c:ci,s})));
+const firstOf=ci=>ITEMS.findIndex(it=>it.c===ci);
+
+/* =================== Avatar =================== */
+const sp={on:false,text:"",syncChar:0,syncT:0,cps:14.5};      // Sprechzustand (Lippen)
+const cue={wave:0,brow:0,nod:0};                               // Gesten-Impulse
+const VIS={a:[.95,1.05],ä:[.7,1.1],e:[.55,1.12],i:[.35,1.18],o:[.7,.78],ö:[.55,.8],u:[.4,.68],ü:[.38,.7],y:[.38,.7],
+  m:[0,.95],b:[0,.95],p:[0,.95],f:[.1,1.02],v:[.1,1.02],w:[.12,1],l:[.3,1],n:[.22,1],r:[.32,.98],s:[.18,1.08],z:[.18,1.08],
+  t:[.22,1.04],d:[.25,1.04],k:[.35,1],g:[.35,1],h:[.45,1],j:[.3,1.1],c:[.25,1.05],ch:[.3,1.05]};
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const nz=(t,a,b,c)=>Math.sin(t*a)*.5+Math.sin(t*b+1.3)*.3+Math.sin(t*c+2.1)*.2;
+const lerp=(a,b,k)=>a+(b-a)*k, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+function addLights(scene){
+  scene.add(new THREE.HemisphereLight(0xfff6ee,0xb3a296,.6*Math.PI));
+  const front=new THREE.DirectionalLight(0xfff4ec,.45*Math.PI); front.position.set(0,.6,4); scene.add(front);
+  const key=new THREE.DirectionalLight(0xfff1e2,1.15*Math.PI); key.position.set(1.6,2.8,3); scene.add(key);
+  const fill=new THREE.DirectionalLight(0xdfe9ff,.4*Math.PI); fill.position.set(-2.5,1.4,2); scene.add(fill);
+  const rim=new THREE.DirectionalLight(0xffffff,.6*Math.PI); rim.position.set(-1,2.5,-3); scene.add(rim);
+}
+
+function createLia(){
+  const M=(h,r=.62,m=0)=>new THREE.MeshStandardMaterial({color:h,roughness:r,metalness:m});
+  const SKIN=M(0xdc9f80,.55), LIP=M(0xbd6a6c,.45), HAIR=M(0x4d2f22,.42), BROW=M(0x3a2319,.7),
+        SCRUB=M(0x2b7d86,.75), SCRUB2=M(0x23656d,.78), TRIM=M(0x1e5960,.7), SHOE=M(0xf3f3f1,.5),
+        WHITE=M(0xf7f5f2,.25), DARK=M(0x2a2a30,.5), MOUTH=M(0x5a1e26,.8), TEETH=M(0xf4f1ea,.35), METAL=M(0xc8ccd2,.25,.9), TIE=M(0xd6111c,.5);
+  function mesh(g,m,x=0,y=0,z=0,p){const o=new THREE.Mesh(g,m);o.position.set(x,y,z);if(p)p.add(o);return o;}
+  const sph=(r,w=32,h=24)=>new THREE.SphereGeometry(r,w,h);
+  const cyl=(a,b,h,s=28)=>new THREE.CylinderGeometry(a,b,h,s,1);
+  function tube(pts,r,seg=40,rs=12,taper){const c=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));
+    const g=new THREE.TubeGeometry(c,seg,r,rs,false);
+    if(taper){const P=g.attributes.position,v=new THREE.Vector3();
+      for(let i=0;i<=seg;i++){const t=i/seg,cp=c.getPointAt(t),f=taper(t);
+        for(let j=0;j<=rs;j++){const k=i*(rs+1)+j;v.fromBufferAttribute(P,k).sub(cp).multiplyScalar(f).add(cp);P.setXYZ(k,v.x,v.y,v.z);}}
+      g.computeVertexNormals();}
+    return g;}
+  function canvasTex(w,h,draw){const c=document.createElement("canvas");c.width=w;c.height=h;draw(c.getContext("2d"));
+    const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;}
+
+  const lia=new THREE.Group();                 // y-up, 1 Einheit ≈ 1 m bei Lebensgröße
+  const hips=new THREE.Group(); lia.add(hips);
+  const torso=new THREE.Group(); torso.position.y=.82; hips.add(torso);
+  for(const s of[-1,1]){
+    mesh(cyl(.072,.066,.74),SCRUB2,s*.095,.45,0,hips);
+    const sh=mesh(sph(.06),SHOE,s*.1,.04,.035,hips); sh.scale.set(1,.6,1.75);
+    mesh(cyl(.068,.068,.05),SHOE,s*.097,.08,0,hips);
+  }
+  const prof=[[0,-.16],[.225,-.16],[.228,-.1],[.215,.02],[.192,.16],[.188,.27],[.2,.4],[.206,.5],[.19,.56],[.13,.6],[.06,.62],[0,.62]].map(p=>new THREE.Vector2(p[0],p[1]));
+  const tunic=mesh(new THREE.LatheGeometry(prof,48),SCRUB,0,0,0,torso); tunic.scale.z=.68;
+  const hem=mesh(new THREE.TorusGeometry(.226,.008,8,48),TRIM,0,-.158,0,torso); hem.rotation.x=Math.PI/2; hem.scale.y=.68;
+  const vShape=new THREE.Shape(); vShape.moveTo(-.065,.6); vShape.lineTo(.065,.6); vShape.lineTo(0,.44); vShape.lineTo(-.065,.6);
+  const vneck=mesh(new THREE.ShapeGeometry(vShape),SKIN,0,0,.133,torso); vneck.rotation.x=-.22;
+  mesh(tube([[-.07,.6,.122],[-.03,.52,.14],[0,.435,.142],[.03,.52,.14],[.07,.6,.122]],.007,40,6),TRIM,0,0,0,torso);
+  const pocket=mesh(new THREE.PlaneGeometry(.1,.08),SCRUB2,-.1,.33,.12,torso); pocket.rotation.y=-.3;
+  mesh(new THREE.BoxGeometry(.006,.05,.004),DARK,-.09,.37,.124,torso).rotation.y=-.3;
+  mesh(new THREE.BoxGeometry(.006,.045,.004),TIE,-.108,.365,.123,torso).rotation.y=-.3;
+  const tagTex=canvasTex(320,120,g=>{g.fillStyle="#fff";g.fillRect(0,0,320,120);g.fillStyle="#d6111c";g.fillRect(0,0,320,34);
+    g.fillStyle="#fff";g.font="bold 24px sans-serif";g.fillText("AWO",12,26);g.fillStyle="#1d1d24";g.font="bold 46px sans-serif";g.fillText("Lia",14,96);
+    g.font="22px sans-serif";g.fillText("Pflegefach-",130,76);g.fillText("person",130,102);});
+  const tag=mesh(new THREE.PlaneGeometry(.095,.036),new THREE.MeshStandardMaterial({map:tagTex,roughness:.4}),.1,.4,.122,torso); tag.rotation.y=.32;
+  const steth=new THREE.Group(); torso.add(steth);
+  mesh(tube([[-.075,.6,.05],[-.06,.64,-.06],[0,.655,-.085],[.06,.64,-.06],[.075,.6,.05]],.009,40,8),DARK,0,0,0,steth);
+  mesh(tube([[-.075,.6,.05],[-.095,.52,.13],[-.07,.4,.15],[-.035,.32,.152]],.008,30,8),DARK,0,0,0,steth);
+  mesh(tube([[.075,.6,.05],[.098,.5,.13],[.085,.42,.148]],.008,30,8),DARK,0,0,0,steth);
+  mesh(cyl(.026,.026,.012,24),METAL,-.03,.305,.158,steth).rotation.x=Math.PI/2-.2;
+  mesh(cyl(.02,.02,.004,24),DARK,-.03,.304,.165,steth).rotation.x=Math.PI/2-.2;
+  const neckGrp=new THREE.Group(); neckGrp.position.y=.6; torso.add(neckGrp);
+  mesh(cyl(.045,.05,.13),SKIN,0,.04,0,neckGrp);
+  const head=new THREE.Group(); head.position.set(0,.185,.012); head.scale.setScalar(.132); neckGrp.add(head);
+  const skull=sph(1,64,48),P=skull.attributes.position,v3=new THREE.Vector3();
+  for(let i=0;i<P.count;i++){v3.fromBufferAttribute(P,i);
+    if(v3.y<0){const a=Math.pow(-v3.y,1.6);v3.x*=1-.2*a;v3.z*=1-.08*a;v3.y*=1.07;}
+    v3.x*=.88; if(v3.z>0)v3.z*=.96; if(v3.z<0&&v3.y>-.3)v3.z*=1.04; P.setXYZ(i,v3.x,v3.y,v3.z);}
+  mesh(skull,SKIN,0,0,0,head);
+  for(const s of[-1,1]){const e=mesh(sph(.2,20,16),SKIN,s*.86,-.08,-.02,head);e.scale.set(.35,1,.7);}
+  const nose=mesh(sph(.085,24,18),SKIN,0,-.2,.95,head); nose.scale.set(1.05,.85,.9);
+  mesh(tube([[0,.04,.9],[0,-.08,.95],[0,-.17,.99]],.045,16,10,t=>.6+.4*t),SKIN,0,0,0,head);
+  for(const s of[-1,1]){const w=mesh(sph(.06,16,12),SKIN,s*.07,-.23,.9,head);w.scale.set(1,.7,.8);}
+  const blushTex=canvasTex(64,64,g=>{const r=g.createRadialGradient(32,32,2,32,32,31);r.addColorStop(0,"rgba(232,120,110,.5)");r.addColorStop(1,"rgba(232,120,110,0)");g.fillStyle=r;g.fillRect(0,0,64,64);});
+  for(const s of[-1,1]){const b=mesh(new THREE.PlaneGeometry(.42,.32),new THREE.MeshBasicMaterial({map:blushTex,transparent:true,depthWrite:false}),s*.47,-.24,.8,head);b.rotation.y=s*.5;}
+  const irisTex=canvasTex(128,128,g=>{const r=g.createRadialGradient(64,64,10,64,64,64);r.addColorStop(0,"#2c1a0e");r.addColorStop(.32,"#2c1a0e");
+    r.addColorStop(.36,"#7a5230");r.addColorStop(.7,"#5b3b20");r.addColorStop(.92,"#3a2414");r.addColorStop(1,"#20140c");g.fillStyle=r;g.fillRect(0,0,128,128);
+    g.strokeStyle="rgba(170,130,80,.35)";g.lineWidth=1.2;for(let a=0;a<60;a++){const t=a/60*Math.PI*2;g.beginPath();g.moveTo(64+Math.cos(t)*24,64+Math.sin(t)*24);g.lineTo(64+Math.cos(t)*56,64+Math.sin(t)*56);g.stroke();}});
+  const IRIS=new THREE.MeshStandardMaterial({map:irisTex,roughness:.25});
+  const eyes=[], lids=[], lowLids=[];
+  for(const s of[-1,1]){
+    const socket=new THREE.Group(); socket.position.set(s*.33,.06,.76); head.add(socket);
+    const eye=new THREE.Group(); socket.add(eye); eyes.push(eye);
+    mesh(sph(.165,32,24),WHITE,0,0,0,eye);
+    mesh(new THREE.CircleGeometry(.08,32),IRIS,0,0,.168,eye);
+    mesh(sph(.012,8,8),new THREE.MeshBasicMaterial({color:0xffffff}),.03,.035,.17,socket);
+    const lid=new THREE.Group(); socket.add(lid); lids.push(lid);
+    mesh(new THREE.SphereGeometry(.178,32,16,0,Math.PI*2,0,Math.PI/2),SKIN,0,0,0,lid);
+    const lash=mesh(new THREE.TorusGeometry(.179,.013,6,32,Math.PI),BROW,0,0,0,lid); lash.rotation.set(Math.PI/2,0,0);
+    const low=new THREE.Group(); socket.add(low); lowLids.push(low);
+    mesh(new THREE.SphereGeometry(.169,32,16,0,Math.PI*2,Math.PI/2,Math.PI/2),SKIN,0,0,0,low);
+    low.rotation.x=.6;
+  }
+  const brows=new THREE.Group(); head.add(brows);
+  for(const s of[-1,1]) mesh(tube([[s*.13,.33,.9],[s*.32,.4,.86],[s*.52,.35,.74]],.04,24,8,t=>.65+.5*Math.sin(Math.PI*Math.min(1,t*1.4))),BROW,0,0,0,brows);
+  const mouth=new THREE.Group(); mouth.position.set(0,-.5,.83); head.add(mouth);
+  const cavity=mesh(sph(.2,24,16),MOUTH,0,-.02,-.04,mouth); cavity.scale.set(1,.12,.45);
+  mesh(new THREE.BoxGeometry(.2,.045,.03),TEETH,0,.005,.045,mouth);
+  const upLip=mesh(tube([[-.21,-.015,-.02],[-.1,.025,.05],[0,.012,.075],[.1,.025,.05],[.21,-.015,-.02]],.042,30,10,t=>.45+.65*Math.sin(Math.PI*t)),LIP,0,0,0,mouth);
+  const loLip=mesh(tube([[-.2,-.02,-.02],[-.1,-.05,.05],[0,-.058,.07],[.1,-.05,.05],[.2,-.02,-.02]],.05,30,10,t=>.4+.7*Math.sin(Math.PI*t)),LIP,0,0,0,mouth);
+  const hairCap=mesh(new THREE.SphereGeometry(1.07,56,40,0,Math.PI*2,0,Math.PI*.6),HAIR,0,.02,-.05,head); hairCap.rotation.x=-.9; hairCap.scale.set(.93,1,1.02);
+  const back=mesh(sph(1.02,40,30),HAIR,0,.12,-.3,head); back.scale.set(.86,.8,.8);
+  const sweep=mesh(new THREE.SphereGeometry(1.085,48,24,Math.PI*.15,Math.PI*.75,Math.PI*.12,Math.PI*.3),HAIR,0,.03,-.02,head); sweep.rotation.set(-.15,0,.32);
+  const sideL=mesh(sph(.5,32,20),HAIR,-.74,.34,.12,head); sideL.scale.set(.36,.62,.7); sideL.rotation.z=-.15;
+  const sideR=mesh(sph(.5,32,20),HAIR,.75,.36,.1,head); sideR.scale.set(.34,.58,.68); sideR.rotation.z=.15;
+  mesh(tube([[0,.35,-.95],[0,.1,-1.28],[0,-.45,-1.35],[.03,-1.1,-1.15],[.06,-1.6,-.95]],.24,48,14,t=>1-.75*t*t),HAIR,0,0,0,head);
+  const tie=mesh(new THREE.TorusGeometry(.17,.06,10,24),TIE,0,.2,-1.08,head); tie.rotation.x=.9;
+  function arm(s){
+    const sh=new THREE.Group(); sh.position.set(s*.218,.5,0); torso.add(sh);
+    mesh(sph(.06),SCRUB,0,0,0,sh); mesh(cyl(.06,.056,.15),SCRUB,0,-.07,0,sh); mesh(cyl(.046,.04,.26),SKIN,0,-.17,0,sh);
+    const el=new THREE.Group(); el.position.y=-.3; sh.add(el);
+    mesh(sph(.041),SKIN,0,0,0,el); mesh(cyl(.04,.031,.25),SKIN,0,-.125,0,el);
+    const wr=new THREE.Group(); wr.position.y=-.255; el.add(wr);
+    const palm=mesh(sph(.042,20,16),SKIN,0,-.045,0,wr); palm.scale.set(1,1.3,.55);
+    for(let f=0;f<4;f++){const fi=mesh(cyl(.0105,.009,.06,10),SKIN,(f-1.5)*.017*-s,-.11+Math.abs(f-1.3)*.006,.004,wr);fi.rotation.x=.12;}
+    const th=mesh(cyl(.012,.01,.055,10),SKIN,s>0?-.036:.036,-.045,.022,wr); th.rotation.z=s>0?-.6:.6; th.rotation.x=.4;
+    return {sh,el,wr};}
+  const R=arm(1), L=arm(-1);
+  const shTex=canvasTex(128,128,g=>{const r=g.createRadialGradient(64,64,4,64,64,62);r.addColorStop(0,"rgba(0,0,0,.5)");r.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=r;g.fillRect(0,0,128,128);});
+  const shadow=mesh(new THREE.PlaneGeometry(1.1,.75),new THREE.MeshBasicMaterial({map:shTex,transparent:true,depthWrite:false}),0,.003,.02,lia); shadow.rotation.x=-Math.PI/2;
+
+  // Zustand
+  let open=0,width=1,blinkT=2.4,blinkP=-1,sac=[0,0],sacT=1;
+  const tmp=new THREE.Vector3();
+  function update(dt,t,camWorld,follow){
+    const m=reduce?.35:1, talk=sp.on?1:0;
+    // Zum Betrachter drehen (nur in AR)
+    if(follow&&camWorld&&lia.parent){tmp.copy(camWorld);lia.parent.worldToLocal(tmp);
+      const dx=tmp.x-lia.position.x, dz=tmp.z-lia.position.z;
+      if(Math.hypot(dx,dz)>1e-3){let d=Math.atan2(dx,dz)-lia.rotation.y; d=Math.atan2(Math.sin(d),Math.cos(d)); lia.rotation.y+=d*Math.min(1,dt*1.5);}}
+    const br=Math.sin(t*1.35);
+    torso.scale.set(1+br*.004,1+br*.006,1+br*.008);
+    hips.rotation.z=nz(t*.25,1,1.7,2.9)*.018*m; hips.position.x=nz(t*.25,1.1,1.9,.7)*.012*m;
+    torso.rotation.z=-hips.rotation.z*1.4; torso.rotation.y=nz(t*.3,1,1.6,2.3)*.07*m+talk*nz(t,.9,1.7,2.6)*.05;
+    torso.rotation.x=talk*.03;
+    // Blickrichtung zur Kamera
+    let yawT=0,pitT=.12;
+    if(camWorld){tmp.copy(camWorld);neckGrp.worldToLocal(tmp);
+      yawT=Math.atan2(tmp.x,tmp.z); pitT=-Math.atan2(tmp.y-.19,Math.hypot(tmp.x,tmp.z));
+      if(tmp.z<0){yawT=clamp(yawT,-1.2,1.2);} }
+    cue.nod*=Math.pow(.02,dt);
+    const hy=clamp(yawT*.55,-.6,.6), hp=clamp(pitT*.5,-.35,.35);
+    head.rotation.y=lerp(head.rotation.y,hy+nz(t*.4,1,1.8,2.7)*.1*m+talk*nz(t,1.3,2.1,3.3)*.06,Math.min(1,dt*3));
+    head.rotation.x=lerp(head.rotation.x,hp+nz(t*.35,1.3,2.2,.8)*.04*m+talk*nz(t,1.9,3.1,4.3)*.04+cue.nod*.12,Math.min(1,dt*3));
+    head.rotation.z=nz(t*.3,1.1,.6,2.4)*.05*m+talk*nz(t,1.1,2.3,1.7)*.04;
+    if((sacT-=dt)<0){sacT=.8+Math.random()*2.2;sac=Math.random()<.6?[0,0]:[(Math.random()-.5)*.14,(Math.random()-.5)*.08];}
+    const gy=clamp(yawT-head.rotation.y,-.4,.4)+sac[0], gx=clamp(pitT-head.rotation.x,-.35,.35)+sac[1];
+    eyes.forEach(e=>{e.rotation.y=lerp(e.rotation.y,gy,Math.min(1,dt*25));e.rotation.x=lerp(e.rotation.x,gx,Math.min(1,dt*25));});
+    const lidG=eyes[0].rotation.x;
+    if((blinkT-=dt)<0&&blinkP<0){blinkP=0;blinkT=2+Math.random()*3.5;if(Math.random()<.15)blinkT=.25;}
+    let close=0; if(blinkP>=0){blinkP+=dt;close=blinkP<.07?blinkP/.07:blinkP<.11?1:Math.max(0,1-(blinkP-.11)/.13);if(blinkP>.24)blinkP=-1;}
+    lids.forEach(l=>l.rotation.x=lerp(-.62+lidG*.6,1.05,close));
+    lowLids.forEach(l=>l.rotation.x=.62+lidG*.3);
+    cue.brow*=Math.pow(.15,dt); brows.position.y=cue.brow*.08+talk*Math.max(0,nz(t,2.3,3.7,1.1))*.03;
+    let to=0,tw=1;
+    if(sp.on){const pos=sp.syncChar+(performance.now()-sp.syncT)/1000*sp.cps, i=Math.floor(pos);
+      if(i<sp.text.length){const c=sp.text[i].toLowerCase(), c2=sp.text.slice(i,i+2).toLowerCase();
+        const v=VIS[c2]||VIS[c]; if(v){to=v[0];tw=v[1];} else {to=.05;tw=1;}}}
+    open=lerp(open,to,Math.min(1,dt*22)); width=lerp(width,tw,Math.min(1,dt*18));
+    loLip.position.y=-open*.09; cavity.scale.y=.1+open*.85; cavity.position.y=-.02-open*.05;
+    mouth.scale.x=width*.9; upLip.position.y=open*.015;
+    const A=(a,tx,tz,ex,wz,k)=>{a.sh.rotation.x=lerp(a.sh.rotation.x,tx,k);a.sh.rotation.z=lerp(a.sh.rotation.z,tz,k);
+      a.el.rotation.x=lerp(a.el.rotation.x,ex,k);a.el.rotation.z=lerp(a.el.rotation.z,0,k);a.wr.rotation.z=lerp(a.wr.rotation.z,wz,k);};
+    const k=Math.min(1,dt*4);
+    if(cue.wave>0){cue.wave-=dt;R.sh.rotation.x=lerp(R.sh.rotation.x,-.2,k*2);R.sh.rotation.z=lerp(R.sh.rotation.z,2.55,k*2);
+      R.el.rotation.x=lerp(R.el.rotation.x,-.2,k*2);R.el.rotation.z=Math.sin(t*8)*.42-.15;}
+    else if(sp.on)A(R,-.42+nz(t,1.1,1.9,2.7)*.18,-.05+nz(t,.8,1.5,2.2)*.06,-1.15+nz(t,1.6,2.4,3.1)*.3,nz(t,1.3,2,2.9)*.3,k);
+    else A(R,nz(t*.3,1,1.4,2)*.03,.09,-.15,0,k);
+    if(sp.on)A(L,-.3+nz(t+4,1,1.7,2.5)*.16,.05+nz(t+2,.7,1.3,2.1)*.05,-1+nz(t+3,1.4,2.2,2.9)*.28,nz(t+1,1.2,1.9,2.6)*.3,k);
+    else A(L,nz(t*.3+2,1,1.4,2)*.03,-.09,-.15,0,k);
+  }
+  return {lia,update};
+}
+
+/* =================== Vorschau (ohne AR) =================== */
+const prevCanvas=document.getElementById("prev");
+const pRenderer=new THREE.WebGLRenderer({canvas:prevCanvas,alpha:true,antialias:true});
+pRenderer.setPixelRatio(Math.min(devicePixelRatio,2)); pRenderer.toneMapping=THREE.ACESFilmicToneMapping; pRenderer.toneMappingExposure=.95;
+const pScene=new THREE.Scene(); addLights(pScene);
+const pCam=new THREE.PerspectiveCamera(26,1,.05,50); pCam.position.set(0,1.15,4.6); pCam.lookAt(0,.97,0);
+const pLia=createLia(); pScene.add(pLia.lia);
+let previewOn=true; const clock=new THREE.Clock();
+function pResize(){const w=prevCanvas.clientWidth,h=prevCanvas.clientHeight;if(!w||!h)return;pRenderer.setSize(w,h,false);pCam.aspect=w/h;
+  const need=2.1/(2*Math.tan(13*Math.PI/180)); pCam.position.z=Math.max(need, need/Math.min(1,pCam.aspect*1.3)); pCam.updateProjectionMatrix();}
+new ResizeObserver(pResize).observe(prevCanvas); pResize();
+pRenderer.setAnimationLoop(()=>{if(!previewOn)return;const dt=Math.min(clock.getDelta(),.05);
+  pLia.update(dt,clock.elapsedTime,pCam.position,false);pRenderer.render(pScene,pCam);});
+
+/* =================== Sprache =================== */
+const synth=window.speechSynthesis||null;
+let voice=null, muted=!synth, playing=false, paused=false, cur=0, endIdx=ITEMS.length, curCh=-1, token=0, timer=null, keep=null, utts=[];
+function scoreVoice(v){const nm=v.name; let s=0;
+  if(/natural|neural|online/i.test(nm))s+=100; if(/premium|enhanced|wavenet|studio/i.test(nm))s+=80;
+  if(/google/i.test(nm))s+=40; if(/de-DE/i.test(v.lang))s+=6;
+  if(/katja|amala|seraphina|louisa|elke|gisela|klarissa|maja|tanja|ingrid|anna|petra|helena|hedda|vicki|marlene|sabine|female/i.test(nm))s+=15;
+  if(/conrad|killian|kasper|florian|stefan|markus|yannick|jonas|ralf|bernd|christoph|georg|male\b|martin|viktor/i.test(nm))s-=30;
+  return s;}
+function pickVoice(){if(!synth)return;const vs=synth.getVoices().filter(v=>/^de/i.test(v.lang)).sort((a,b)=>scoreVoice(b)-scoreVoice(a));voice=vs[0]||null;}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice;}
+function unlockSpeech(){if(!synth)return;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;u.lang="de-DE";synth.speak(u);}catch(e){}}
+
+const sub=document.getElementById("sub"), card=document.getElementById("card"), chipsEl=document.getElementById("chips");
+const playB=document.getElementById("play"), muteB=document.getElementById("mute");
+CH.forEach((c,i)=>{const b=document.createElement("button");b.textContent=c.t;b.onclick=()=>start(firstOf(i),firstOf(i)+c.s.length);chipsEl.appendChild(b);});
+function showChapter(ci){if(ci===curCh)return;curCh=ci;const c=CH[ci];
+  card.innerHTML=c.card?CARDS[c.card]:"";card.dataset.off=c.card?"0":"1";if(c.wave)cue.wave=1.8;cue.brow=1;
+  [...chipsEl.children].forEach((b,i)=>b.setAttribute("aria-current",i===ci));
+  chipsEl.children[ci].scrollIntoView({block:"nearest",inline:"center",behavior:reduce?"auto":"smooth"});}
+function beginSentence(i){cur=i;const it=ITEMS[i];showChapter(it.c);sub.hidden=false;sub.textContent=it.s;
+  sp.text=it.s;sp.syncChar=0;sp.syncT=performance.now();sp.cps=14.5;sp.on=true;cue.brow=Math.max(cue.brow,.6);}
+function endSentence(){sp.on=false;cue.nod=1;}
+function start(from,to=ITEMS.length){halt();playing=true;paused=false;endIdx=to;playB.textContent="Pause";curCh=-1;speakFrom(from);}
+function resumeAt(i){halt();playing=true;paused=false;playB.textContent="Pause";speakFrom(i);}
+function speakFrom(from){const my=++token;
+  if(!muted&&synth){
+    utts=[];
+    for(let i=from;i<endIdx;i++){const u=new SpeechSynthesisUtterance(ITEMS[i].s);
+      u.lang=voice?voice.lang:"de-DE"; if(voice)u.voice=voice; u.rate=1; u.pitch=1;
+      u.onstart=()=>{if(my===token)beginSentence(i);};
+      u.onboundary=e=>{if(my===token&&e.name==="word"){sp.syncChar=e.charIndex;sp.syncT=performance.now();}};
+      u.onend=()=>{if(my!==token)return;endSentence();if(i===endIdx-1)finish();};
+      u.onerror=e=>{if(my!==token||e.error==="interrupted"||e.error==="canceled")return;setMuted(true);speakFrom(cur);};
+      utts.push(u); synth.speak(u);}
+    if(voice&&!voice.localService)keep=setInterval(()=>{if(synth.speaking&&!paused){synth.pause();synth.resume();}},10000);
+  } else {
+    const stepTo=i=>{if(my!==token)return;if(i>=endIdx){finish();return;}beginSentence(i);
+      const ms=ITEMS[i].s.length/14.5*1000+150;
+      timer=setTimeout(()=>{if(my!==token)return;endSentence();timer=setTimeout(()=>stepTo(i+1),ITEMS[i+1]&&ITEMS[i+1].c!==ITEMS[i].c?650:280);},ms);};
+    stepTo(from);}
+}
+function halt(){token++;clearTimeout(timer);clearInterval(keep);if(synth)synth.cancel();sp.on=false;}
+function finish(){halt();playing=false;playB.textContent="Nochmal";card.dataset.off="1";sub.textContent="Das war's! Tippe ein Thema an, um es noch einmal zu hören.";}
+function setMuted(v){muted=v;muteB.setAttribute("aria-pressed",v);}
+if(muted)setMuted(true);
+playB.onclick=()=>{if(!playing){start(0);return;} if(!paused){halt();paused=true;playB.textContent="Weiter";} else resumeAt(cur);};
+muteB.onclick=()=>{if(!synth)return;setMuted(!muted);if(playing&&!paused)resumeAt(cur);};
+
+/* =================== Modus-Steuerung =================== */
+const startEl=document.getElementById("start"), arEl=document.getElementById("ar"), hud=document.getElementById("hud");
+const statusEl=document.getElementById("status"), scanHint=document.getElementById("scanHint"), scanText=document.getElementById("scanText");
+const replaceB=document.getElementById("replace");
+let mode=null, stopMode=null, sizeK=1, applySize=()=>{}, wake=null;
+async function keepAwake(){try{wake=await navigator.wakeLock?.request("screen");}catch(e){}}
+function enterHud(m){mode=m;startEl.hidden=true;hud.hidden=false;sub.hidden=true;card.dataset.off="1";keepAwake();}
+function leave(){halt();playing=false;sp.on=false;if(stopMode)stopMode();stopMode=null;mode=null;
+  arEl.hidden=true;arEl.innerHTML="";hud.hidden=true;startEl.hidden=false;scanHint.hidden=false;replaceB.hidden=true;
+  try{wake&&wake.release();}catch(e){} previewOn=true; pResize();}
+document.getElementById("exit").onclick=leave;
+document.getElementById("bigger").onclick=()=>{sizeK=Math.min(4,sizeK*1.25);applySize();};
+document.getElementById("smaller").onclick=()=>{sizeK=Math.max(.25,sizeK/1.25);applySize();};
+
+/* --- Modus 1: Karten-Tracking (iPhone & Android) --- */
+document.getElementById("goCard").onclick=async()=>{
+  unlockSpeech(); previewOn=false; enterHud("card"); arEl.hidden=false;
+  statusEl.textContent="Kamera startet …"; scanHint.hidden=false; scanText.textContent="Richte die Kamera auf das Lia-Bild der Karte.";
+  try{
+    const {MindARThree}=await import("mindar-image-three");
+    const mindar=new MindARThree({container:arEl,imageTargetSrc:"lia-ziel.mind",uiScanning:"no",uiLoading:"no",uiError:"no",filterMinCF:.0001,filterBeta:.01});
+    const {renderer,scene,camera}=mindar;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.95;
+    addLights(scene);
+    const anchor=mindar.addAnchor(0);
+    const stage=new THREE.Group(); stage.rotation.x=Math.PI/2; anchor.group.add(stage);   // Karte liegt flach: Bild-Normale = oben
+    const L=createLia(); stage.add(L.lia);
+    const base=.45; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();
+    L.lia.position.set(.05,0,.06);
+    let started=false;
+    anchor.onTargetFound=()=>{scanHint.hidden=true;statusEl.textContent="Lia steht auf der Karte";
+      if(!started){started=true;start(0);} };
+    anchor.onTargetLost=()=>{statusEl.textContent="Karte nicht im Bild";};
+    await mindar.start();
+    statusEl.textContent="Suche Karte …";
+    const ck=new THREE.Clock(), camW=new THREE.Vector3();
+    renderer.setAnimationLoop(()=>{const dt=Math.min(ck.getDelta(),.05);camera.getWorldPosition(camW);
+      L.update(dt,ck.elapsedTime,camW,true);renderer.render(scene,camera);});
+    stopMode=()=>{renderer.setAnimationLoop(null);try{mindar.stop();}catch(e){}try{renderer.dispose();}catch(e){}};
+  }catch(err){
+    console.error(err); statusEl.textContent="Kamera nicht verfügbar";
+    scanText.textContent=location.protocol!=="https:"&&location.hostname!=="localhost"
+      ?"Die Kamera funktioniert nur über https. Bitte die Seite über eine https-Adresse öffnen."
+      :"Die Kamera konnte nicht gestartet werden. Bitte Kamerazugriff erlauben und die Seite neu laden.";
+  }
+};
+
+/* --- Modus 2: WebXR ohne Karte (Android/ARCore) --- */
+const goXR=document.getElementById("goXR");
+if(navigator.xr&&navigator.xr.isSessionSupported){navigator.xr.isSessionSupported("immersive-ar").then(ok=>{goXR.hidden=!ok;}).catch(()=>{});}
+goXR.onclick=async()=>{
+  unlockSpeech();
+  let session;
+  try{session=await navigator.xr.requestSession("immersive-ar",{requiredFeatures:["hit-test"],optionalFeatures:["dom-overlay"],domOverlay:{root:hud}});}
+  catch(e){alert("AR konnte nicht gestartet werden.");return;}
+  previewOn=false; enterHud("xr");
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(devicePixelRatio); renderer.setSize(innerWidth,innerHeight);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.95;
+  renderer.xr.enabled=true; arEl.hidden=false; arEl.style.background="transparent"; arEl.appendChild(renderer.domElement);
+  const scene=new THREE.Scene(); addLights(scene);
+  const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.01,30);
+  const reticle=new THREE.Mesh(new THREE.RingGeometry(.06,.08,40).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff}));
+  reticle.matrixAutoUpdate=false; reticle.visible=false; scene.add(reticle);
+  const place=new THREE.Group(); place.visible=false; scene.add(place);
+  const L=createLia(); place.add(L.lia);
+  const base=.17; applySize=()=>L.lia.scale.setScalar(base*sizeK); applySize();   // ca. 30 cm groß
+  renderer.xr.setReferenceSpaceType("local"); await renderer.xr.setSession(session);
+  const viewer=await session.requestReferenceSpace("viewer"); const hitSrc=await session.requestHitTestSource({space:viewer});
+  let placed=false, started=false;
+  statusEl.textContent="Fläche suchen …"; scanHint.hidden=false; scanText.textContent="Bewege das Handy langsam über den Tisch und tippe, wenn der Kreis erscheint.";
+  hud.querySelectorAll("button,nav").forEach(el=>el.addEventListener("beforexrselect",e=>e.preventDefault()));
+  session.addEventListener("select",()=>{if(!reticle.visible)return;
+    place.position.setFromMatrixPosition(reticle.matrix); place.visible=true; placed=true; reticle.visible=false;
+    scanHint.hidden=true; replaceB.hidden=false; statusEl.textContent="Lia steht auf dem Tisch";
+    if(!started){started=true;start(0);} });
+  replaceB.onclick=()=>{placed=false;place.visible=false;replaceB.hidden=true;scanHint.hidden=false;statusEl.textContent="Fläche suchen …";};
+  const ck=new THREE.Clock(), camW=new THREE.Vector3();
+  renderer.setAnimationLoop((ts,frame)=>{const dt=Math.min(ck.getDelta(),.05);
+    if(frame&&!placed){const hits=frame.getHitTestResults(hitSrc);
+      if(hits.length){const pose=hits[0].getPose(renderer.xr.getReferenceSpace());reticle.visible=true;reticle.matrix.fromArray(pose.transform.matrix);} else reticle.visible=false;}
+    renderer.xr.getCamera().getWorldPosition(camW);
+    L.update(dt,ck.elapsedTime,camW,true); renderer.render(scene,camera);});
+  session.addEventListener("end",()=>{renderer.setAnimationLoop(null);renderer.dispose();if(mode==="xr"){stopMode=null;leave();}});
+  stopMode=()=>{try{session.end();}catch(e){}};
+};
+
+/* --- Modus 3: Anhören in der Vorschau --- */
+document.getElementById("goListen").onclick=()=>{
+  unlockSpeech(); enterHud("listen"); scanHint.hidden=true; statusEl.textContent="Vorschau";
+  // Vorschau groß im Hintergrund
+  arEl.hidden=false; arEl.style.background="radial-gradient(110% 85% at 50% 18%,#f1ece6 0%,#d9d2ca 55%,#b7aea5 100%)";
+  const r=new THREE.WebGLRenderer({antialias:true,alpha:true}); r.setPixelRatio(Math.min(devicePixelRatio,2));
+  r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=.95; arEl.appendChild(r.domElement);
+  const sc=new THREE.Scene(); addLights(sc); const cam=new THREE.PerspectiveCamera(26,1,.05,50);
+  const L=createLia(); sc.add(L.lia); previewOn=false;
+  const base=1; applySize=()=>L.lia.scale.setScalar(base*Math.min(sizeK,1.6)); applySize();
+  const rs=()=>{r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.position.set(0,1.1,Math.max(5.2,5.2/Math.min(1,cam.aspect*1.4)));cam.lookAt(0,1,0);cam.updateProjectionMatrix();};
+  rs(); addEventListener("resize",rs);
+  const ck=new THREE.Clock();
+  r.setAnimationLoop(()=>{const dt=Math.min(ck.getDelta(),.05);L.update(dt,ck.elapsedTime,cam.position,false);r.render(sc,cam);});
+  stopMode=()=>{r.setAnimationLoop(null);r.dispose();removeEventListener("resize",rs);arEl.style.background="";};
+  start(0);
+};
+
+/* --- Druckkarte --- */
+const printEl=document.getElementById("print");
+document.getElementById("goPrint").onclick=()=>{
+  const url=location.href.split("#")[0];
+  try{const q=qrcode(0,"M");q.addData(url);q.make();document.getElementById("qr").innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});}
+  catch(e){document.getElementById("qr").textContent=url;}
+  printEl.hidden=false; startEl.hidden=true; previewOn=false;};
+document.getElementById("pBack").onclick=()=>{printEl.hidden=true;startEl.hidden=false;previewOn=true;pResize();};
+document.getElementById("pPrint").onclick=()=>window.print();
+
+if(location.protocol==="file:")document.getElementById("envNote").textContent="Hinweis: Als lokale Datei geöffnet. Kamera und Karten-Tracking funktionieren erst, wenn der Ordner über https im Netz liegt.";
+</script>
+</body>
+</html>
