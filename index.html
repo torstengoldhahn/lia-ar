@@ -155,6 +155,7 @@ h1 em{font-style:normal;color:var(--accent)}
     <button class="go alt" data-go="en">▶ English</button>
     <p style="font-size:13px">Kamera erlauben, Handy auf den Tisch richten. · Allow the camera and point at your desk.</p>
     <button class="small" id="gateCard">Ich habe die Lia-Karte · I have the Lia card</button>
+    <p style="font-size:11px;opacity:.45">Version 19.10. · 14:30</p>
   </div>
 </section>
 
@@ -480,11 +481,14 @@ function createLia(){
 
 /* =================== Tonspur =================== */
 const player=new Audio(); player.preload="auto"; player.setAttribute("playsinline","");
+// iPhone: Ton über den Lautsprecher als Medienwiedergabe ausgeben (sonst bei aktiver Kamera oft stumm/Hörmuschel)
+function audioPlayback(){try{if(navigator.audioSession&&navigator.audioSession.type!=="playback")navigator.audioSession.type="playback";}catch(e){}}
+audioPlayback();
 const TRACKS={}; let TRACK=null;
 for(const l of ["de","en"]) fetch(`audio/lia-${l}.json`).then(r=>r.json()).then(j=>{TRACKS[l]=j;if(l===LANG)TRACK=j;}).catch(()=>{});
 function setTrack(){TRACK=TRACKS[LANG]||null;const src=`audio/lia-${LANG}.mp3`;if(!player.src.endsWith(src)){player.src=src;player.load();}}
 setTrack();
-function unlockAudio(){try{player.muted=true;const p=player.play();if(p)p.then(()=>{if(!playing){player.pause();}player.muted=muted;}).catch(()=>{player.muted=muted;});}catch(e){}}
+function unlockAudio(){audioPlayback();try{player.muted=true;const p=player.play();if(p)p.then(()=>{if(!playing){player.pause();}player.muted=muted;}).catch(()=>{player.muted=muted;});}catch(e){}}
 
 /* =================== Vorschau (ohne AR) =================== */
 const prevCanvas=document.getElementById("prev");
@@ -526,13 +530,19 @@ function tick(){if(!playing||paused)return;
   const [a,b]=times(cur);const on=t>=a&&t<=b+.05;if(sp.on&&!on)cue.nod=1;sp.on=on;}
 function start(from,to=ITEMS.length){halt();playing=true;paused=false;endIdx=to;curCh=-1;playB.textContent=tx("pause");
   setSentence(from);endT=times(to-1)[1]+.25;
-  if(TRACK||player.src){player.muted=muted;const st=times(from)[0]-.05;
+  audioPlayback();
+  if(TRACK||player.src){player.muted=muted;player.volume=1;const st=times(from)[0]-.05;
     pendingSeek=Math.max(0,st);seekTries=0;if(player.readyState>=1){try{player.currentTime=pendingSeek;}catch(e){}}
     const p=player.play();
     if(p)p.catch(err=>{if(err&&err.name==="NotAllowedError"){halt();playing=false;askTap(()=>start(from,to));}});
     if(!TRACK)simT=performance.now()-st*1000;}
-  poll=setInterval(tick,40);}
-function halt(){clearInterval(poll);try{player.pause();}catch(e){}sp.on=false;}
+  poll=setInterval(tick,40);
+  // Wächter: läuft der Ton nach kurzer Zeit nicht, um einen Tipp bitten (iPhone)
+  clearTimeout(watchdog);const t0=player.currentTime;
+  watchdog=setTimeout(()=>{if(playing&&!paused&&!muted&&(player.paused||player.currentTime===t0)){
+    askTap(()=>{audioPlayback();player.muted=false;player.play().catch(()=>{});});}},1800);}
+let watchdog=null;
+function halt(){clearInterval(poll);clearTimeout(watchdog);try{player.pause();}catch(e){}sp.on=false;}
 function finish(){halt();playing=false;playB.textContent=tx("again");card.dataset.off="1";sub.textContent=tx("done");}
 playB.onclick=()=>{if(!playing){start(0);return;}
   if(!paused){halt();paused=true;playB.textContent=tx("resume");}
@@ -579,7 +589,7 @@ const talkWhenReady=()=>{if(!autoStarted&&!playing){autoStarted=true;start(0);}}
 
 async function openCamera(){
   const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
-  const v=document.createElement("video");v.className="camfeed";v.setAttribute("playsinline","");v.muted=true;v.autoplay=true;v.srcObject=s;arEl.appendChild(v);await v.play();return {v,s};
+  const v=document.createElement("video");v.className="camfeed";v.setAttribute("playsinline","");v.muted=true;v.autoplay=true;v.srcObject=s;arEl.appendChild(v);await v.play();audioPlayback();return {v,s};
 }
 function camError(err){console.error(err);setStatus(null);
   setHint(location.protocol!=="https:"&&location.hostname!=="localhost"?"https":"noCam",false);}
@@ -680,7 +690,7 @@ async function startCard(){
     L.lia.position.set(0,0,.05);
     anchor.onTargetFound=()=>{setHint(null);setStatus("onCard");cue.wave=2.4;cue.brow=1;talkWhenReady();};
     anchor.onTargetLost=()=>{setStatus("lost");};
-    await mindar.start();setStatus("searchCard");
+    await mindar.start();audioPlayback();setStatus("searchCard");
     const ck=new THREE.Clock(),camW=new THREE.Vector3();
     renderer.setAnimationLoop(()=>{const dt=Math.min(ck.getDelta(),.05);camera.getWorldPosition(camW);
       const seen=anchor.group.visible;L.update(dt,ck.elapsedTime,seen?camW:null,seen);renderer.render(scene,camera);});
